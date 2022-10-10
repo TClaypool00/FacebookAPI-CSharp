@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FacebookAPI.App", "FacebookAPI.App\FacebookAPI.App.csproj", "{D722AE1B-CFB0-4D5C-B7AE-510456BF7629}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FacebookAPI.App", "FacebookAPI.App\FacebookAPI.App.csproj", "{D722AE1B-CFB0-4D5C-B7AE-510456BF7629}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FacebookAPI-CSharp.DataAccess", "FacebookAPI-CSharp.DataAccess\FacebookAPI-CSharp.DataAccess.csproj", "{3E264017-50EA-44DA-902A-61AA3D335780}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FacebookAPI-CSharp.Core", "FacebookAPI-CSharp.Core\FacebookAPI-CSharp.Core.csproj", "{A76CD7DB-A856-4F82-95A4-3AF30D2707EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{D722AE1B-CFB0-4D5C-B7AE-510456BF7629}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D722AE1B-CFB0-4D5C-B7AE-510456BF7629}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D722AE1B-CFB0-4D5C-B7AE-510456BF7629}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E264017-50EA-44DA-902A-61AA3D335780}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E264017-50EA-44DA-902A-61AA3D335780}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E264017-50EA-44DA-902A-61AA3D335780}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E264017-50EA-44DA-902A-61AA3D335780}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A76CD7DB-A856-4F82-95A4-3AF30D2707EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A76CD7DB-A856-4F82-95A4-3AF30D2707EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A76CD7DB-A856-4F82-95A4-3AF30D2707EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A76CD7DB-A856-4F82-95A4-3AF30D2707EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,9 @@
+using FacebookAPI_CSharp.DataAccess;
+using FacebookAPI_CSharp.DataAccess.Models;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+var version = new MySqlServerVersion(new Version(8, 0, 29));
 
 // Add services to the container.
 
@@ -6,6 +11,14 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<FacebookDBContext>(options => options
+    .UseMySql(SecretConfig.ConnectionString, version)
+    // The following three options help with debugging, but should
+    // be changed or removed for production.
+    .LogTo(Console.WriteLine, LogLevel.Information)
+    .EnableSensitiveDataLogging()
+    .EnableDetailedErrors()
+);
 
 var app = builder.Build();
 

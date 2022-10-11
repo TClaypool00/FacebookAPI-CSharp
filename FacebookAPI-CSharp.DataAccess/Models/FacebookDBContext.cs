@@ -4,11 +4,24 @@ namespace FacebookAPI_CSharp.DataAccess.Models
 {
     public class FacebookDBContext: DbContext
     {
-        public FacebookDBContext(DbContextOptions options): base(options)
+        public FacebookDBContext()
         {
 
         }
 
+        public FacebookDBContext(DbContextOptions<FacebookDBContext> options): base(options)
+        {
+
+        }        
+
         public DbSet<User> Users { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseMySql(SecretConfig.ConnectionString, new MySqlServerVersion(new Version(8, 0, 29)));
+            }
+        }
     }
 }

@@ -1,5 +1,7 @@
+using FacebookAPI_CSharp.Core.Interfaces;
 using FacebookAPI_CSharp.DataAccess;
 using FacebookAPI_CSharp.DataAccess.Models;
+using FacebookAPI_CSharp.DataAccess.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +21,8 @@ builder.Services.AddDbContext<FacebookDBContext>(options => options
     .EnableSensitiveDataLogging()
     .EnableDetailedErrors()
 );
+
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

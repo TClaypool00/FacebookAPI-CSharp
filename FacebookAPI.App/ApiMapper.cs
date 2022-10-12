@@ -1,6 +1,6 @@
-﻿using FacebookAPI.App.ApiModels;
-using FacebookAPI.App.PostModels;
-using FacebookAPI_CSharp.Core.CoreModels;
+﻿using FacebookAPI.App.Models.ApiModels;
+using FacebookAPI.App.Models.PostModels;
+using FacebookAPI.Core.CoreModels;
 
 namespace FacebookAPI.App
 {
@@ -10,17 +10,16 @@ namespace FacebookAPI.App
         {
             return new CoreUser
             {
-                UserId = user.UserId,
+                UserId = (int)user.UserId,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
                 IsAdmin = user.IsAdmin,
-                PhoneNum = user.PhoneNum,
-                Password = user.Password
+                PhoneNum = user.PhoneNum
             };
         }
 
-        public static CoreUser MapUser(PostUser user)
+        public static CoreUser MapUser(RegisterModel user)
         {
             return new CoreUser
             {
@@ -28,7 +27,7 @@ namespace FacebookAPI.App
                 LastName = user.LastName,
                 Email = user.Email,
                 PhoneNum = user.PhoneNum,
-                Password=user.Password
+                Password = user.Password
             };
         }
 
@@ -41,8 +40,7 @@ namespace FacebookAPI.App
                 LastName = user.LastName,
                 Email = user.Email,
                 IsAdmin = user.IsAdmin,
-                PhoneNum = user.PhoneNum,
-                Password = user.Password
+                PhoneNum = user.PhoneNum
             };
         }
     }

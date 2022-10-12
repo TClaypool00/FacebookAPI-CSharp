@@ -1,10 +1,10 @@
-﻿using FacebookAPI_CSharp.Core.CoreModels;
-using FacebookAPI_CSharp.Core.Interfaces;
-using FacebookAPI_CSharp.DataAccess.Models;
+﻿using FacebookAPI.Core.CoreModels;
+using FacebookAPI.Core.Interfaces;
+using FacebookAPI.DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
-namespace FacebookAPI_CSharp.DataAccess.Services
+namespace FacebookAPI.DataAccess.Services
 {
     public class UserService : IUserService, IGeneralService
     {
@@ -81,6 +81,7 @@ namespace FacebookAPI_CSharp.DataAccess.Services
             try
             {
                 var dataUser = await GetDataUser(id);
+                user.Password = dataUser.Password;
 
                 _context.Entry(dataUser).CurrentValues.SetValues(Mapper.MapUser(user));
 

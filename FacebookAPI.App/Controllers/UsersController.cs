@@ -1,14 +1,13 @@
-﻿using FacebookAPI.App.ApiModels;
-using FacebookAPI.App.PostModels;
-using FacebookAPI_CSharp.Core.Interfaces;
-using FacebookAPI_CSharp.DataAccess.Models;
+﻿using FacebookAPI.App.Models.ApiModels;
+using FacebookAPI.App.Models.PostModels;
+using FacebookAPI.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FacebookAPI.App.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UsersController : ControllerHelper
     {
         private readonly IUserService _service;
 
@@ -19,7 +18,7 @@ namespace FacebookAPI.App.Controllers
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<List<User>>> GetUsers()
+        public async Task<ActionResult<List<ApiUser>>> GetUsers()
         {
             var users = await _service.GetUsersAsync();
 
@@ -48,7 +47,7 @@ namespace FacebookAPI.App.Controllers
         // PUT: api/Users/5
         [HttpPut("{id}")]
         public async Task<ActionResult<ApiUser>> PutUser(int id, ApiUser user)
-        {
+        {          
             if (!await _service.UserExistsAsync(id))
             {
                 return NotFound(UserDoesNotExist(id));
@@ -66,7 +65,7 @@ namespace FacebookAPI.App.Controllers
 
         // POST: api/Users
         [HttpPost]
-        public async Task<ActionResult> PostUser(PostUser user)
+        public async Task<ActionResult> PostUser(RegisterModel user)
         {
             if (!user.PasswordsAreTheSame())
             {
@@ -76,6 +75,11 @@ namespace FacebookAPI.App.Controllers
             if (!_service.PasswordMeetsRequirements(user.Password))
             {
                 return BadRequest("Password does not meet requirements");
+            }
+
+            if (user.IsAdmin)
+            {
+                return BadRequest("You cannot register as an admin");
             }
 
             user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
@@ -104,11 +108,6 @@ namespace FacebookAPI.App.Controllers
         private string UserDoesNotExist(int id)
         {
             return $"User with an id of {id} does not exist.";
-        }
-
-        public static string UserErrorMessage()
-        {
-            return "An error has occurred. We apologize and will fix the error as soon as possible.";
         }
     }
 }

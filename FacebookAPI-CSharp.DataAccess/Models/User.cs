@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FacebookAPI_CSharp.DataAccess.Models
+namespace FacebookAPI.DataAccess.Models
 {
     public class User
     {

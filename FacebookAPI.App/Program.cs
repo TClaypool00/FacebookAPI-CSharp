@@ -1,7 +1,7 @@
-using FacebookAPI_CSharp.Core.Interfaces;
-using FacebookAPI_CSharp.DataAccess;
-using FacebookAPI_CSharp.DataAccess.Models;
-using FacebookAPI_CSharp.DataAccess.Services;
+using FacebookAPI.Core.Interfaces;
+using FacebookAPI.DataAccess;
+using FacebookAPI.DataAccess.Models;
+using FacebookAPI.DataAccess.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

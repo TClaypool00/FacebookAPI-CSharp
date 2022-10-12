@@ -1,12 +1,11 @@
-﻿using FacebookAPI_CSharp.DataAccess.PartialModels;
+﻿using FacebookAPI.DataAccess.PartialModels;
 using System.ComponentModel.DataAnnotations;
 
-namespace FacebookAPI_CSharp.DataAccess.Models
+namespace FacebookAPI.DataAccess.Models;
+
+public class Post : PartialPostModel
 {
-    public class Post : PartialPostModel
-    {
-        [Required]
-        [Key]
-        public int PostId { get; set; }
-    }
+    [Required]
+    [Key]
+    public int PostId { get; set; }
 }

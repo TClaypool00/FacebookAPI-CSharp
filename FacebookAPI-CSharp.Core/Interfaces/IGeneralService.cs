@@ -1,4 +1,4 @@
-﻿namespace FacebookAPI_CSharp.Core.Interfaces
+﻿namespace FacebookAPI.Core.Interfaces
 {
     public interface IGeneralService
     {

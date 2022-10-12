@@ -22,7 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FacebookAPI-CSharp.Core\FacebookAPI-CSharp.Core.csproj" />
+    <ProjectReference Include="..\FacebookAPI-CSharp.Core\FacebookAPI.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

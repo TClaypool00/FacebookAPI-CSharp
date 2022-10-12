@@ -1,8 +1,8 @@
-﻿using FacebookAPI_CSharp.DataAccess.Models;
+﻿using FacebookAPI.DataAccess.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace FacebookAPI_CSharp.DataAccess.PartialModels
+namespace FacebookAPI.DataAccess.PartialModels
 {
     public class PartialPostModel
     {

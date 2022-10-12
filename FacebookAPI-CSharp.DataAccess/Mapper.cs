@@ -1,7 +1,7 @@
-﻿using FacebookAPI_CSharp.Core.CoreModels;
-using FacebookAPI_CSharp.DataAccess.Models;
+﻿using FacebookAPI.Core.CoreModels;
+using FacebookAPI.DataAccess.Models;
 
-namespace FacebookAPI_CSharp.DataAccess
+namespace FacebookAPI.DataAccess
 {
     public class Mapper
     {

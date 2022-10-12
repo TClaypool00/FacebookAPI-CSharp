@@ -1,6 +1,6 @@
-﻿using FacebookAPI_CSharp.Core.CoreModels;
+﻿using FacebookAPI.Core.CoreModels;
 
-namespace FacebookAPI_CSharp.Core.Interfaces
+namespace FacebookAPI.Core.Interfaces
 {
     public interface IUserService
     {

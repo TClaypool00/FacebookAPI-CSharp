@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FacebookAPI-CSharp.DataAccess\FacebookAPI-CSharp.DataAccess.csproj" />
+    <ProjectReference Include="..\FacebookAPI-CSharp.DataAccess\FacebookAPI.DataAccess.csproj" />
   </ItemGroup>
 
 </Project>

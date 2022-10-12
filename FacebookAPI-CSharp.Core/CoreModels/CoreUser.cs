@@ -1,4 +1,4 @@
-﻿namespace FacebookAPI_CSharp.Core.CoreModels
+﻿namespace FacebookAPI.Core.CoreModels
 {
     public class CoreUser
     {        

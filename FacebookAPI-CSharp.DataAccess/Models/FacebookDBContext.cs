@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace FacebookAPI_CSharp.DataAccess.Models
+namespace FacebookAPI.DataAccess.Models
 {
     public class FacebookDBContext: DbContext
     {

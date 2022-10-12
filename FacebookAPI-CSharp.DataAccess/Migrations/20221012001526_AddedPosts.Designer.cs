@@ -3,6 +3,7 @@ using System;
 using FacebookAPI_CSharp.DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FacebookAPI_CSharp.DataAccess.Migrations
 {
     [DbContext(typeof(FacebookDBContext))]
-    partial class FacebookDBContextModelSnapshot : ModelSnapshot
+    [Migration("20221012001526_AddedPosts")]
+    partial class AddedPosts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

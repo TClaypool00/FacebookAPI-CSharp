@@ -29,5 +29,7 @@ namespace FacebookAPI_CSharp.DataAccess.Models
         [Required]
         [MaxLength(255)]
         public string Password { get; set; }
+
+        public List<Post> Posts { get; set; }
     }
 }

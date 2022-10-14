@@ -105,7 +105,7 @@ namespace FacebookAPI.App.Controllers
             }
         }
 
-        private string UserDoesNotExist(int id)
+        public static string UserDoesNotExist(int id)
         {
             return $"User with an id of {id} does not exist.";
         }

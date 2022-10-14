@@ -1,4 +1,4 @@
-﻿using FacebookAPI.Core.CoreModels;
+﻿using FacebookAPI.Core.Models.CoreModels;
 
 namespace FacebookAPI.Core.Interfaces
 {

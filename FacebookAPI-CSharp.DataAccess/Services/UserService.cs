@@ -1,5 +1,5 @@
-﻿using FacebookAPI.Core.CoreModels;
-using FacebookAPI.Core.Interfaces;
+﻿using FacebookAPI.Core.Interfaces;
+using FacebookAPI.Core.Models.CoreModels;
 using FacebookAPI.DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;

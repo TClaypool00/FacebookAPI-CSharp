@@ -5,9 +5,9 @@ VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FacebookAPI.App", "FacebookAPI.App\FacebookAPI.App.csproj", "{D722AE1B-CFB0-4D5C-B7AE-510456BF7629}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FacebookAPI.DataAccess", "FacebookAPI-CSharp.DataAccess\FacebookAPI.DataAccess.csproj", "{3E264017-50EA-44DA-902A-61AA3D335780}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FacebookAPI.DataAccess", "FacebookAPI.DataAccess\FacebookAPI.DataAccess.csproj", "{3E264017-50EA-44DA-902A-61AA3D335780}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FacebookAPI.Core", "FacebookAPI-CSharp.Core\FacebookAPI.Core.csproj", "{A76CD7DB-A856-4F82-95A4-3AF30D2707EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FacebookAPI.Core", "FacebookAPI.Core\FacebookAPI.Core.csproj", "{A76CD7DB-A856-4F82-95A4-3AF30D2707EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

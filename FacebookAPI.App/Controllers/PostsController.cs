@@ -1,9 +1,7 @@
 ﻿using FacebookAPI.App.Models.ApiModels;
 using FacebookAPI.App.Models.PostModels;
 using FacebookAPI.Core.Interfaces;
-using FacebookAPI.DataAccess.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FacebookAPI.App.Controllers
 {
@@ -78,7 +76,7 @@ namespace FacebookAPI.App.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Post>> PostPost(ApiPostTextModel post)
+        public async Task<ActionResult<ApiPostModel>> PostPost(ApiPostTextModel post)
         {
             if (!await _userService.UserExistsAsync(post.UserId))
             {

@@ -31,5 +31,7 @@ namespace FacebookAPI.DataAccess.Models
         public string Password { get; set; }
 
         public List<Post> Posts { get; set; }
+        public List<Friend> SenderFriends { get; set; }
+        public List<Friend> ReceiverFriends { get; set; }
     }
 }

@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace FacebookAPI_CSharp.DataAccess.Migrations
+namespace FacebookAPI.DataAccess.Migrations
 {
-    public partial class AddedUserAndPost : Migration
+    public partial class InitalCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

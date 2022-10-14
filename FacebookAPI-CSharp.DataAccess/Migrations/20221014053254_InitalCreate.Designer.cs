@@ -8,17 +8,17 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace FacebookAPI_CSharp.DataAccess.Migrations
+namespace FacebookAPI.DataAccess.Migrations
 {
     [DbContext(typeof(FacebookDBContext))]
-    [Migration("20221012042743_AddedUserAndPost")]
-    partial class AddedUserAndPost
+    [Migration("20221014053254_InitalCreate")]
+    partial class InitalCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.9")
+                .HasAnnotation("ProductVersion", "6.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("FacebookAPI.DataAccess.Models.Post", b =>

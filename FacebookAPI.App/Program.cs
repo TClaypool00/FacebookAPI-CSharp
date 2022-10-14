@@ -23,6 +23,7 @@ builder.Services.AddDbContext<FacebookDBContext>(options => options
 );
 
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPostService, PostService>();
 
 var app = builder.Build();
 

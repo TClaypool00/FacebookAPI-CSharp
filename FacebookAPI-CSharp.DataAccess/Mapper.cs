@@ -1,25 +1,50 @@
-﻿using FacebookAPI.Core.CoreModels;
+﻿using FacebookAPI.Core.Models.CoreModels;
 using FacebookAPI.DataAccess.Models;
 
 namespace FacebookAPI.DataAccess
 {
     public class Mapper
     {
+        public static CorePost MapPost(Post post)
+        {
+            return new CorePost
+            {
+                PostId = post.PostId,
+                Body = post.Body,
+                DatePosted = post.DatePosted,
+                User = MapUser(post.User, false)
+            };
+        }
+
+        public static Post MapPost(CorePost post)
+        {
+            var dataPost = new Post
+            {
+                Body = post.Body,
+                DatePosted = post.DatePosted,
+                UserId = post.User.UserId,
+            };
+
+            if (post.PostId != 0)
+            {
+                dataPost.PostId = post.PostId;
+            }
+
+            return dataPost;
+        }
+
         public static CoreUser MapUser(User user, bool includePassword)
         {
-            var coreUser =  new CoreUser
+            return new CoreUser
             {
                 UserId = user.UserId,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
                 IsAdmin = user.IsAdmin,
-                PhoneNum = user.PhoneNum
+                PhoneNum = user.PhoneNum,
+                Password = includePassword ? user.Password : ""
             };
-
-            coreUser.Password = includePassword ? user.Password : "";
-
-            return coreUser;
         }
 
         public static User MapUser(CoreUser user, int? userId = null)

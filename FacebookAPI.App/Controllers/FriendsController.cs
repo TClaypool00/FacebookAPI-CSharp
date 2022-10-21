@@ -1,121 +1,127 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using FacebookAPI.App.Models.ApiModels;
+using FacebookAPI.App.Models.PostModels;
+using FacebookAPI.Core.Interfaces;
+using FacebookAPI.DataAccess.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using FacebookAPI.DataAccess.Models;
 
 namespace FacebookAPI.App.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FriendsController : ControllerBase
+    public class FriendsController : ControllerHelper
     {
-        private readonly FacebookDBContext _context;
+        private readonly IFriendService _service;
+        private readonly IUserService _userService;
 
-        public FriendsController(FacebookDBContext context)
+        public FriendsController(IFriendService service, IUserService userService)
         {
-            _context = context;
-        }
-
-        // GET: api/Friends
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Friend>>> GetFriends()
-        {
-            return await _context.Friends.ToListAsync();
-        }
-
-        // GET: api/Friends/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Friend>> GetFriend(int id)
-        {
-            var friend = await _context.Friends.FindAsync(id);
-
-            if (friend == null)
-            {
-                return NotFound();
-            }
-
-            return friend;
-        }
-
-        // PUT: api/Friends/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutFriend(int id, Friend friend)
-        {
-            if (id != friend.SendId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(friend).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!FriendExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            _service = service;
+            _userService = userService;
         }
 
         // POST: api/Friends
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Friend>> PostFriend(Friend friend)
+        public async Task<ActionResult> PostFriend([FromBody]ApiPostFriend friend)
         {
-            _context.Friends.Add(friend);
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (FriendExists(friend.SendId))
+                if (!await _service.FriendExists(friend.SenderId, friend.ReceiverId))
                 {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                    if (friend.SenderReciverIdSame())
+                    {
+                        return BadRequest(friend.IdsCannotBeSame);
+                    }
 
-            return CreatedAtAction("GetFriend", new { id = friend.SendId }, friend);
+                    if (!await _userService.UserExistsAsync(friend.SenderId))
+                    {
+                        return NotFound(UsersController.UserDoesNotExist(friend.SenderId));
+                    }
+
+                    if (!await _userService.UserExistsAsync(friend.ReceiverId))
+                    {
+                        return NotFound(UsersController.UserDoesNotExist(friend.ReceiverId));
+                    }
+
+                    var coreFriend = await ApiMapper.MapFriend(friend, _userService);
+                    await _service.AddFriendAsync(coreFriend);
+
+                    return Ok("Friend request has been sent");
+                } else
+                {
+                    return BadRequest(NoFriendExists(friend.SenderId, friend.SenderId, true));
+                }
+            } catch (Exception)
+            {
+                return StatusCode(500, UserErrorMessage());
+            }
+        }
+
+        [HttpPut("accept")]
+        public async Task<ActionResult> AcceptFriendAsync([FromBody] ApiPostFriend friend)
+        {
+            try
+            {
+                if (await _service.FriendExists(friend.SenderId, friend.ReceiverId))
+                {
+                    if (friend.SenderReciverIdSame())
+                    {
+                        return BadRequest(friend.IdsCannotBeSame);
+                    }
+
+                    if (!await _service.FriendExists(friend.SenderId, friend.ReceiverId))
+                    {
+                        return NotFound(UsersController.UserDoesNotExist(friend.SenderId));
+                    }
+
+                    if (!await _userService.UserExistsAsync(friend.SenderId))
+                    {
+                        return NotFound(UsersController.UserDoesNotExist(friend.SenderId));
+                    }
+
+                    if (!await _userService.UserExistsAsync(friend.ReceiverId))
+                    {
+                        return NotFound(UsersController.UserDoesNotExist(friend.ReceiverId));
+                    }
+
+                    var coreFriend = await _service.GetFrinedAsync(friend.SenderId, friend.ReceiverId);
+
+                    await _service.AddFriendAsync(coreFriend);
+
+                    return Ok(true);
+                } else
+                {
+                    return NotFound(NoFriendExists(friend.SenderId, friend.ReceiverId));
+                }
+            } catch (Exception)
+            {
+                return StatusCode(500, UserErrorMessage());
+            }
         }
 
         // DELETE: api/Friends/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteFriend(int id)
+        [HttpDelete("{senderId}&{receiverId}")]
+        public async Task<IActionResult> DeleteFriend(int senderId, int receiverId)
         {
-            var friend = await _context.Friends.FindAsync(id);
-            if (friend == null)
+            try
             {
-                return NotFound();
+                if (await _service.FriendExists(senderId, receiverId))
+                {
+                    await _service.DeleteFriendAsync(senderId, receiverId);
+                    return Ok("Friend has been deleted");
+                } else
+                {
+                    return NotFound(NoFriendExists(senderId, senderId));
+                }
+            } catch (Exception)
+            {
+                return StatusCode(500, UserErrorMessage());
             }
-
-            _context.Friends.Remove(friend);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
-        private bool FriendExists(int id)
+        private static string NoFriendExists(int senderId, int receiverId, bool exists = false)
         {
-            return _context.Friends.Any(e => e.SendId == id);
+            return $"A friend with a sender id of {senderId} and {receiverId}" + (exists ? " already exists" : "does not exist");
         }
     }
 }

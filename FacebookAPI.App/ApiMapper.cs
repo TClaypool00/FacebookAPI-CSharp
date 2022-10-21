@@ -7,6 +7,38 @@ namespace FacebookAPI.App
 {
     public class ApiMapper
     {
+        public static async Task<CoreFriend> MapFriend(ApiPostFriend friend, IUserService userService)
+        {
+            return new CoreFriend
+            {
+                Sender = await userService.GetUserAsync(friend.SenderId),
+                Receiver = await userService.GetUserAsync(friend.ReceiverId)
+            };
+        }
+
+        public static ApiFriend MapFriend(CoreFriend friend, int userId)
+        {
+            var apiFriend = new ApiFriend
+            {
+                DateAccepted = friend.DateAccepted,
+                IsAccepted = friend.IsAccepted
+            };
+
+            if (userId != friend.Sender.UserId)
+            {
+                apiFriend.UserId = friend.Sender.UserId;
+                apiFriend.FirstName = friend.Sender.FirstName;
+                apiFriend.LastName = friend.Sender.LastName;
+            } else
+            {
+                apiFriend.UserId = friend.Receiver.UserId;
+                apiFriend.FirstName = friend.Receiver.FirstName;
+                apiFriend.LastName = friend.Receiver.LastName;
+            }
+
+            return apiFriend;
+        }
+
         public static async Task<CorePost> MapPost(ApiPostModel post, IUserService userService)
         {
             return new CorePost

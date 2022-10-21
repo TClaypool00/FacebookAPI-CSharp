@@ -5,6 +5,39 @@ namespace FacebookAPI.DataAccess
 {
     public class Mapper
     {
+        public static CoreFriend MapFriend(Friend friend)
+        {
+            return new CoreFriend
+            {
+                Sender = MapUser(friend.Sender),
+                Receiver = MapUser(friend.Receiver),
+                DateAccepted = friend.DateAccepted,
+                IsAccepted = friend.IsAccepted
+            };
+        }
+
+        public static CoreFriend MapFriend(Friend friend, CoreUser user)
+        {
+            return new CoreFriend
+            {
+                Sender = user.UserId == friend.SendId ? user : MapUser(friend.Sender),
+                Receiver = user.UserId == friend.ReceiverId ? user : MapUser(friend.Receiver),
+                DateAccepted = friend.DateAccepted,
+                IsAccepted = friend.IsAccepted
+            };
+        }
+
+        public static Friend MapFriend(CoreFriend frined)
+        {
+            return new Friend
+            {
+                SendId = frined.Sender.UserId,
+                ReceiverId = frined.Receiver.UserId,
+                DateAccepted = frined.DateAccepted,
+                IsAccepted = frined.IsAccepted
+            };
+        } 
+
         public static CorePost MapPost(Post post)
         {
             return new CorePost
@@ -12,7 +45,7 @@ namespace FacebookAPI.DataAccess
                 PostId = post.PostId,
                 Body = post.Body,
                 DatePosted = post.DatePosted,
-                User = MapUser(post.User, false)
+                User = MapUser(post.User)
             };
         }
 
@@ -33,7 +66,7 @@ namespace FacebookAPI.DataAccess
             return dataPost;
         }
 
-        public static CoreUser MapUser(User user, bool includePassword)
+        public static CoreUser MapUser(User user, bool includePassword = false)
         {
             return new CoreUser
             {

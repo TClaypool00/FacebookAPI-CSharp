@@ -31,13 +31,13 @@ namespace FacebookAPI.DataAccess.Models
             modelBuilder.Entity<Friend>()
                 .HasKey(f => new
                 {
-                    f.SendId,
+                    f.SenderId,
                     f.ReceiverId
                 });
             modelBuilder.Entity<Friend>()
                 .HasOne(s => s.Sender)
                 .WithMany(f => f.SenderFriends)
-                .HasForeignKey(f => f.SendId);
+                .HasForeignKey(f => f.SenderId);
             modelBuilder.Entity<Friend>()
                 .HasOne(r => r.Receiver)
                 .WithMany(f => f.ReceiverFriends)

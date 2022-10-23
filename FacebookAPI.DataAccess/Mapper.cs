@@ -20,7 +20,7 @@ namespace FacebookAPI.DataAccess
         {
             return new CoreFriend
             {
-                Sender = user.UserId == friend.SendId ? user : MapUser(friend.Sender),
+                Sender = user.UserId == friend.SenderId ? user : MapUser(friend.Sender),
                 Receiver = user.UserId == friend.ReceiverId ? user : MapUser(friend.Receiver),
                 DateAccepted = friend.DateAccepted,
                 IsAccepted = friend.IsAccepted
@@ -31,7 +31,7 @@ namespace FacebookAPI.DataAccess
         {
             return new Friend
             {
-                SendId = frined.Sender.UserId,
+                SenderId = frined.Sender.UserId,
                 ReceiverId = frined.Receiver.UserId,
                 DateAccepted = frined.DateAccepted,
                 IsAccepted = frined.IsAccepted

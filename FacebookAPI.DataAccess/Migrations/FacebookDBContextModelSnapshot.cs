@@ -21,7 +21,7 @@ namespace FacebookAPI.DataAccess.Migrations
 
             modelBuilder.Entity("FacebookAPI.DataAccess.Models.Friend", b =>
                 {
-                    b.Property<int>("SendId")
+                    b.Property<int>("SenderId")
                         .HasColumnType("int");
 
                     b.Property<int>("ReceiverId")
@@ -33,7 +33,7 @@ namespace FacebookAPI.DataAccess.Migrations
                     b.Property<bool>("IsAccepted")
                         .HasColumnType("tinyint(1)");
 
-                    b.HasKey("SendId", "ReceiverId");
+                    b.HasKey("SenderId", "ReceiverId");
 
                     b.HasIndex("ReceiverId");
 
@@ -114,7 +114,7 @@ namespace FacebookAPI.DataAccess.Migrations
 
                     b.HasOne("FacebookAPI.DataAccess.Models.User", "Sender")
                         .WithMany("SenderFriends")
-                        .HasForeignKey("SendId")
+                        .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

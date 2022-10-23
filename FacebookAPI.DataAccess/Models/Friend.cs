@@ -2,7 +2,7 @@
 {
     public class Friend
     {
-        public int SendId { get; set; }
+        public int SenderId { get; set; }
         public User Sender { get; set; }
 
         public int ReceiverId { get; set; }

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FacebookAPI.DataAccess.Migrations
 {
     [DbContext(typeof(FacebookDBContext))]
-    [Migration("20221014060050_AddedFrinds")]
-    partial class AddedFrinds
+    [Migration("20221023030023_IntialCreate")]
+    partial class IntialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,7 +23,7 @@ namespace FacebookAPI.DataAccess.Migrations
 
             modelBuilder.Entity("FacebookAPI.DataAccess.Models.Friend", b =>
                 {
-                    b.Property<int>("SendId")
+                    b.Property<int>("SenderId")
                         .HasColumnType("int");
 
                     b.Property<int>("ReceiverId")
@@ -35,7 +35,7 @@ namespace FacebookAPI.DataAccess.Migrations
                     b.Property<bool>("IsAccepted")
                         .HasColumnType("tinyint(1)");
 
-                    b.HasKey("SendId", "ReceiverId");
+                    b.HasKey("SenderId", "ReceiverId");
 
                     b.HasIndex("ReceiverId");
 
@@ -116,7 +116,7 @@ namespace FacebookAPI.DataAccess.Migrations
 
                     b.HasOne("FacebookAPI.DataAccess.Models.User", "Sender")
                         .WithMany("SenderFriends")
-                        .HasForeignKey("SendId")
+                        .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

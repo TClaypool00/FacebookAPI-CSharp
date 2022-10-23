@@ -28,7 +28,7 @@ namespace FacebookAPI.DataAccess.Services
 
         public async Task<bool> FriendExists(int senderId, int receiverId)
         {
-            return await _context.Friends.AnyAsync(f => (f.ReceiverId == receiverId && f.SendId == senderId) || (f.ReceiverId == senderId && f.SendId == receiverId));
+            return await _context.Friends.AnyAsync(f => (f.ReceiverId == receiverId && f.SenderId == senderId) || (f.ReceiverId == senderId && f.SenderId == receiverId));
         }
 
         public async Task<List<CoreFriend>> GetFriendsAsync(int userId, bool? isAccepted, CoreUser user)
@@ -36,7 +36,7 @@ namespace FacebookAPI.DataAccess.Services
             var friends = await _context.Friends
                 .Include(s => s.Sender)
                 .Include(s => s.Receiver)
-                .Where(f => f.SendId == userId || f.ReceiverId == userId)
+                .Where(f => f.SenderId == userId || f.ReceiverId == userId)
                 .ToListAsync();
 
             if (isAccepted is not null)
@@ -68,10 +68,10 @@ namespace FacebookAPI.DataAccess.Services
                 return await _context.Friends
                     .Include(s => s.Sender)
                     .Include(s => s.Receiver)
-                    .FirstOrDefaultAsync(f => (f.ReceiverId == receiverId && f.SendId == senderId) || (f.ReceiverId == senderId && f.SendId == receiverId));
+                    .FirstOrDefaultAsync(f => (f.ReceiverId == receiverId && f.SenderId == senderId) || (f.ReceiverId == senderId && f.SenderId == receiverId));
             } else
             {
-                return await _context.Friends.FirstOrDefaultAsync(f => (f.ReceiverId == receiverId && f.SendId == senderId) || (f.ReceiverId == senderId && f.SendId == receiverId));
+                return await _context.Friends.FirstOrDefaultAsync(f => (f.ReceiverId == receiverId && f.SenderId == senderId) || (f.ReceiverId == senderId && f.SenderId == receiverId));
             }
         }
 

@@ -20,6 +20,28 @@ namespace FacebookAPI.App.Controllers
             _userService = userService;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<ApiFriend>> GetFriendsAsync([FromQuery]int userId, bool? isAccepted)
+        {
+            var user = await _userService.GetUserAsync(userId);
+            var friends = await _service.GetFriendsAsync(userId, isAccepted, user);
+
+            if (friends.Count > 0)
+            {
+                var apiFriends = new List<ApiFriend>();
+                ApiFriend apiFriend;
+                for (int i = 0; i < friends.Count; i++)
+                {
+                    apiFriend = ApiMapper.MapFriend(friends[i], userId);
+                    apiFriends.Add(apiFriend);
+                }
+
+                return Ok(apiFriends);
+            }
+
+            return NotFound("No friends found");
+        }
+
         // POST: api/Friends
         [HttpPost]
         public async Task<ActionResult> PostFriend([FromBody]ApiPostFriend friend)
@@ -84,9 +106,7 @@ namespace FacebookAPI.App.Controllers
                         return NotFound(UsersController.UserDoesNotExist(friend.ReceiverId));
                     }
 
-                    var coreFriend = await _service.GetFrinedAsync(friend.SenderId, friend.ReceiverId);
-
-                    await _service.AddFriendAsync(coreFriend);
+                    await _service.AcceptFriendAsync(friend.SenderId, friend.ReceiverId);
 
                     return Ok(true);
                 } else

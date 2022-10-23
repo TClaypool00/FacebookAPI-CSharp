@@ -31,18 +31,18 @@ namespace FacebookAPI.DataAccess.Services
             return await _context.Friends.AnyAsync(f => (f.ReceiverId == receiverId && f.SendId == senderId) || (f.ReceiverId == senderId && f.SendId == receiverId));
         }
 
-        public async Task<CoreFriend> GetFrinedAsync(int senderId, int receiverId)
-        {
-            return Mapper.MapFriend(await GetDataFriendAsync(senderId, receiverId));
-        }
-
-        public async Task<List<CoreFriend>> GetFriendsAsync(int userId, CoreUser user)
+        public async Task<List<CoreFriend>> GetFriendsAsync(int userId, bool? isAccepted, CoreUser user)
         {
             var friends = await _context.Friends
                 .Include(s => s.Sender)
                 .Include(s => s.Receiver)
                 .Where(f => f.SendId == userId || f.ReceiverId == userId)
                 .ToListAsync();
+
+            if (isAccepted is not null)
+            {
+                friends = friends.Where(f => f.IsAccepted = (bool)isAccepted).ToList();
+            }
 
             var coreFriends = new List<CoreFriend>();
             Friend frined;
@@ -75,10 +75,10 @@ namespace FacebookAPI.DataAccess.Services
             }
         }
 
-        public async Task AcceptFriendAsync(CoreFriend friend)
-        {
-            var dataFriend = Mapper.MapFriend(friend);
-            var oldFriend = await GetDataFriendAsync(friend.SendId, friend.ReceiverId);
+        public async Task AcceptFriendAsync(int senderId, int receiverId)
+        {            
+            var oldFriend = await GetDataFriendAsync(senderId, receiverId, false);
+            var dataFriend = oldFriend;
             dataFriend.IsAccepted = true;
             dataFriend.DateAccepted = DateTime.Now;
 

@@ -36,7 +36,31 @@ namespace FacebookAPI.DataAccess
                 DateAccepted = frined.DateAccepted,
                 IsAccepted = frined.IsAccepted
             };
-        } 
+        }
+
+        public static CoreParentType MapParentType(ParentType parentType)
+        {
+            return new CoreParentType
+            {
+                ParenTypeId = parentType.ParentTypeId,
+                Name = parentType.Name
+            };
+        }
+
+        public static ParentType MapParentType(CoreParentType parentType)
+        {
+            var dataParentType = new ParentType
+            {
+                Name = parentType.Name
+            };
+
+            if (parentType.ParenTypeId != 0)
+            {
+                dataParentType.ParentTypeId = parentType.ParenTypeId;
+            }
+
+            return dataParentType;
+        }
 
         public static CorePost MapPost(Post post)
         {

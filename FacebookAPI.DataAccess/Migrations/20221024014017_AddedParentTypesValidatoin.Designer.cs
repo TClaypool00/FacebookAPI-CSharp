@@ -3,6 +3,7 @@ using System;
 using FacebookAPI.DataAccess.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FacebookAPI.DataAccess.Migrations
 {
     [DbContext(typeof(FacebookDBContext))]
-    partial class FacebookDBContextModelSnapshot : ModelSnapshot
+    [Migration("20221024014017_AddedParentTypesValidatoin")]
+    partial class AddedParentTypesValidatoin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

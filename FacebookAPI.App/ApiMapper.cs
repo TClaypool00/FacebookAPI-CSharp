@@ -39,6 +39,24 @@ namespace FacebookAPI.App
             return apiFriend;
         }
 
+        public static CoreParentType MapParentType(ApiPostParentType parentType, int id = 0)
+        {
+            return new CoreParentType
+            {
+                Name = parentType.Name,
+                ParenTypeId = id
+            };
+        }
+
+        public static ApiParentType MapParentType(CoreParentType parentType)
+        {
+            return new ApiParentType
+            {
+                Name = parentType.Name,
+                ParentTypeId = parentType.ParenTypeId
+            };
+        }
+
         public static async Task<CorePost> MapPost(ApiPostModel post, IUserService userService)
         {
             return new CorePost

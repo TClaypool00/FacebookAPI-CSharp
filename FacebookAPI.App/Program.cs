@@ -22,8 +22,10 @@ builder.Services.AddDbContext<FacebookDBContext>(options => options
     .EnableDetailedErrors()
 );
 
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IFriendService, FriendService>();
+builder.Services.AddScoped<IParentTypeService, ParentTypeService>();
 builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

@@ -1,5 +1,7 @@
 using FacebookAPI;
+using FacebookAPI.App_Code.BLL;
 using FacebookAPI.App_Code.BOL;
+using FacebookAPI.App_Code.DAL;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +15,10 @@ builder.Services.AddSwaggerGen();
 
 //Connection string
 builder.Services.AddDbContext<FacebookDbContext>(options => options.UseMySql(SecretConfig.ConnectionString, new MySqlServerVersion(SecretConfig.Version)));
+
+//Services
+builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

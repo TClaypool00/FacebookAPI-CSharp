@@ -5,6 +5,17 @@ namespace FacebookAPI.App_Code.ViewModels
 {
     public class RegisterViewModel : UserViewModel
     {
+        #region Constructors
+        public RegisterViewModel()
+        {
+            if (UserId != 0)
+            {
+                throw new ArgumentException("User Id must be zero");
+            }
+        }
+        #endregion
+
+        #region Public Propeerties
         [Display(Name = "Confirm password")]
         [DataType(DataType.Password)]
         [Required(ErrorMessage = "Confirm password is required")]
@@ -13,11 +24,11 @@ namespace FacebookAPI.App_Code.ViewModels
 
         [Display(Name = "Date of birth")]
         [DataType(DataType.Date)]
-        [Required(ErrorMessage = "Date of birth is required")]        
+        [Required(ErrorMessage = "Date of birth is required")]
         public DateTime? BirthDate { get; set; }
 
         [Required(ErrorMessage = "Gender selection is required")]
         public int? GenderId { get; set; }
-        public List<SelectListItem> GenderDropDown { get; set; }
+        #endregion
     }
 }

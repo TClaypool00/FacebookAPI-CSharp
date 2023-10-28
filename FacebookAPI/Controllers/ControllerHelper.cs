@@ -6,6 +6,9 @@ namespace FacebookAPI.Controllers
     {
         #region Private fields
         private readonly string _errorMessage;
+        #endregion
+
+        #region Protected fields
         protected readonly IConfiguration _configuration;
         #endregion
 

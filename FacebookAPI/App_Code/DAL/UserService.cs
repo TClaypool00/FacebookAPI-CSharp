@@ -8,12 +8,10 @@ namespace FacebookAPI.App_Code.DAL
     public class UserService : ServiceHelper, IUserService
     {
         private readonly string _errorMessage;
-        private readonly IWebHostEnvironment _environment;
 
-        public UserService(FacebookDbContext context, IConfiguration configuration, IWebHostEnvironment environment) : base(configuration, context)
+        public UserService(FacebookDbContext context, IConfiguration configuration) : base(configuration, context)
         {
             _errorMessage = "Could not add a user";
-            _environment = environment;
         }
 
         public string UserCreatedMessage => "Account has been created";

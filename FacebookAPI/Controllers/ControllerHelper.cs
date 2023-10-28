@@ -5,7 +5,8 @@ namespace FacebookAPI.Controllers
     public class ControllerHelper : ControllerBase
     {
         #region Private fields
-        private readonly string _errorMessage;
+        private readonly string _internalMessage;
+        private readonly string _unauthorizedMessage;
         #endregion
 
         #region Protected fields
@@ -16,8 +17,47 @@ namespace FacebookAPI.Controllers
         public ControllerHelper(IConfiguration configuration) : base()
         {
             _configuration = configuration;
-            _errorMessage = _configuration.GetSection("Messages").GetSection("Internal").Value;
+            _internalMessage = _configuration.GetSection("Messages").GetSection("Internal").Value;
+            _unauthorizedMessage = _configuration["Messages:Unauthorized"];
         }
+        #endregion
+
+        #region Protected Properties
+        #region User Claims
+        protected int UseerId
+        {
+            get
+            {
+                return int.Parse(User.Claims.FirstOrDefault(c => c.Type == "UserId").Value);
+            }
+        }
+
+        protected bool IsAdmin
+        {
+            get
+            {
+                return User.Claims.FirstOrDefault(c => c.Type == "IsAdmin").Value == "True";
+            }
+        }
+        #endregion
+
+        #region Messages
+        protected string InternalErrorMessage
+        {
+            get
+            {
+                return _internalMessage;
+            }
+        }
+
+        protected string UnAuthorizedMessage
+        {
+            get
+            {
+                return _unauthorizedMessage;
+            }
+        }
+        #endregion
         #endregion
 
         #region Protected methods
@@ -40,6 +80,12 @@ namespace FacebookAPI.Controllers
 
             return BadRequest(errorList);
         }
+
+        protected bool IsUserIdSame(int userId)
+        {
+            return userId == UseerId;
+        }
         #endregion
+
     }
 }

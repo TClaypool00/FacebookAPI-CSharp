@@ -5,8 +5,11 @@ namespace FacebookAPI.App_Code.ViewModels
 {
     public class UserViewModel : LoginViewModel
     {
-        protected readonly CoreUser _coreUser;
+        #region Private fields
+        protected CoreUser _coreUser;
+        #endregion
 
+        #region Constructors
         public UserViewModel()
         {
 
@@ -14,20 +17,18 @@ namespace FacebookAPI.App_Code.ViewModels
 
         public UserViewModel(CoreUser coreUser)
         {
-            if (coreUser is null)
-            {
-                throw new ArgumentNullException(nameof(coreUser));
-            }
-
-            _coreUser = coreUser;
-
-            UserId = _coreUser.UserId;
-            FirstName = _coreUser.FirstName;
-            LastName = _coreUser.LastName;
-            Email = _coreUser.Email;
-            PhoneNumber = _coreUser.PhoneNumber;
+            Construct(coreUser);
         }
 
+        public UserViewModel(CoreUser coreUser, string token)
+        {
+            Construct(coreUser);
+
+            Token = token;
+        }
+        #endregion
+
+        #region Public Properties
         public int UserId { get; set; }
 
         [Required(ErrorMessage = "First name is required")]
@@ -44,6 +45,32 @@ namespace FacebookAPI.App_Code.ViewModels
         [MaxLength(14, ErrorMessage = "Phone has a max length of 14")]
         [Display(Name = "Phone number")]
         [DataType(DataType.PhoneNumber, ErrorMessage = "Not a valid phone number format")]
-        public string PhoneNumber { get; set; }        
+        public string PhoneNumber { get; set; }
+
+        public bool IsAdmin { get; set; }
+
+        public string Token { get; set; }
+        #endregion
+
+        #region Private methods
+        private void Construct(CoreUser coreUser)
+        {
+            if (coreUser is null)
+            {
+                throw new ArgumentNullException(nameof(coreUser));
+            }
+
+            _coreUser = coreUser;
+
+            UserId = _coreUser.UserId;
+            FirstName = _coreUser.FirstName;
+            LastName = _coreUser.LastName;
+            Email = _coreUser.Email;
+            PhoneNumber = _coreUser.PhoneNumber;
+            IsAdmin = _coreUser.IsAdmin;
+
+            Password = "";
+        }
+        #endregion
     }
 }

@@ -1,10 +1,16 @@
 ﻿using FacebookAPI.App_Code.BLL;
 using FacebookAPI.App_Code.CoreModels;
 using FacebookAPI.App_Code.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace FacebookAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerHelper
@@ -24,6 +30,7 @@ namespace FacebookAPI.Controllers
 
         #region Public methods
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult> CreateUserAsync([FromBody] RegisterViewModel model)
         {
             try
@@ -54,6 +61,61 @@ namespace FacebookAPI.Controllers
                 await _userService.CreateUserAsync(coreUser);
 
                 return Ok(_userService.UserCreatedMessage);
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
+
+        [HttpPost("Login")]
+        [AllowAnonymous]
+        public async Task<ActionResult> LoginAsync([FromBody] LoginViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return DisplayErrors();
+                }
+
+                if (!await _userService.EmailExistsAsync(model.Email))
+                {
+                    return NotFound(_userService.EmailDoesNotExistMessage);
+                }
+
+                var user = await _userService.GetUserAsync(model.Email);
+
+                if (!_passwordService.VerifyPassword(model.Password, user.Password))
+                {
+                    return BadRequest(_passwordService.IncorrectPasswordMessage);
+                }
+
+                var claims = new[]
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                    new Claim("UserId", user.UserId.ToString()),
+                    new Claim("PhoneNumber", user.PhoneNumber),
+                    new Claim("Email", user.Email),
+                    new Claim("IsAdmin", user.IsAdmin.ToString())
+                };
+
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretConfig.SecretKey));
+                var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                var token = new JwtSecurityToken(
+                    _configuration["JWT:Issuer"],
+                    _configuration["JWT:Audience"],
+                    claims,
+                    DateTime.UtcNow,
+                    DateTime.UtcNow.AddMinutes(10),
+                    signIn
+                    );
+
+                var apiUser = new UserViewModel(user, new JwtSecurityTokenHandler().WriteToken(token));
+
+                return Ok(apiUser);
             }
             catch (Exception ex)
             {

@@ -122,6 +122,31 @@ namespace FacebookAPI.Controllers
                 return InternalError(ex);
             }
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetUserAsync(int id)
+        {
+            try
+            {
+                if (!await _userService.UserExistsAsync(id))
+                {
+                    return NotFound(_userService.UserDoesNotExistsMessage);
+                }
+
+                if (!IsUserIdSame(id) && !IsAdmin)
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                var user = await _userService.GetUserAsync(id);
+
+                return Ok(new UserViewModel(user));
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
         #endregion
     }
 }

@@ -71,7 +71,7 @@ namespace FacebookAPI.App_Code.DAL
                 return _context.Users.AnyAsync(u => u.Email == email);
             }
 
-            return _context.Users.AnyAsync(u => u.Email == email && u.UserId == id);
+            return _context.Users.AnyAsync(u => u.Email == email && u.UserId != id);
         }
 
         public async Task<List<CoreUser>> GetFriendsAsync(string search, int userId)
@@ -158,7 +158,7 @@ namespace FacebookAPI.App_Code.DAL
                 return _context.Users.AnyAsync(u => u.PhoneNumber == phoneNumber);
             }
 
-            return _context.Users.AnyAsync(u => u.PhoneNumber == phoneNumber && u.UserId == id);
+            return _context.Users.AnyAsync(u => u.PhoneNumber == phoneNumber && u.UserId != id);
         }
 
         public async Task<bool> UpdatePassword(CoreUser user)
@@ -182,27 +182,33 @@ namespace FacebookAPI.App_Code.DAL
         {
             try
             {
-                var dataUser = await FindFullUser(id);
-                var newUser = new User(user)
-                {
-                    Password = dataUser.Password
-                };
+                var dataUser = await FindUserAndProfile(id);
+                dataUser.FirstName = user.FirstName;
+                dataUser.LastName = user.LastName;
+                dataUser.Email = user.Email;
+                dataUser.PhoneNumber = user.PhoneNumber;
 
-                _context.Entry(dataUser).CurrentValues.SetValues(newUser);
+
+                _context.Users.Update(dataUser);
                 await SaveAsync();
 
                 try
                 {
-                    var dataProfile = new Profile(user.Profile);
-                    _context.Profiles.Update(dataProfile);
+                    dataUser.Profile.AboutMe = user.Profile.AboutMe;
+                    dataUser.Profile.BirthDate = user.Profile.BirthDate;
+                    dataUser.Profile.MiddleName = user.Profile.MiddleName;
+
+                    if (dataUser.Profile.GenderId != user.Profile.GenderId)
+                    {
+                        dataUser.Profile.GenderId = user.Profile.GenderId;
+
+                        dataUser.Profile.Gender = await _context.Genders.FirstOrDefaultAsync(x => x.GenderId == user.Profile.GenderId);
+                    }
+
+                    _context.Profiles.Update(dataUser.Profile);
                     await SaveAsync();
 
-
-                    if (user.Profile.GenderId != user.Profile.Gender.GenderId)
-                    {
-                        var dataGender = await _context.Genders.FirstOrDefaultAsync(g => g.GenderId == user.Profile.GenderId);
-                        user.Profile.Gender = new CoreGender(dataGender);
-                    }
+                    user.Profile.Gender = new CoreGender(dataUser.Profile.Gender);
 
                     return user;
                 }
@@ -261,6 +267,35 @@ namespace FacebookAPI.App_Code.DAL
         private Task<User> FindFullUser(int id)
         {
             return _context.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        }
+
+        private Task<User> FindUserAndProfile(int id)
+        {
+            return _context.Users
+                .Select(u => new User
+                {
+                    UserId = u.UserId,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Password = u.Password,
+                    Email = u.Email,
+                    IsAdmin = u.IsAdmin,
+                    PhoneNumber = u.PhoneNumber,
+                    Profile = new Profile
+                    {
+                        AboutMe = u.Profile.AboutMe,
+                        BirthDate = u.Profile.BirthDate,
+                        MiddleName = u.Profile.MiddleName,
+                        ProfileId = u.ProfileId,
+                        Gender = new Gender
+                        {
+                            GenderId = u.Profile.Gender.GenderId,
+                            GenderName = u.Profile.Gender.GenderName
+                        }
+                    }
+
+                })
+                .FirstOrDefaultAsync (a => a.UserId == id);
         }
     }
 }

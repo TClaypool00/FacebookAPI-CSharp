@@ -1,6 +1,9 @@
 ﻿using FacebookAPI.App_Code.BLL;
 using FacebookAPI.App_Code.CoreModels;
 using FacebookAPI.App_Code.ViewModels;
+using FacebookAPI.App_Code.ViewModels.ApiModels;
+using FacebookAPI.App_Code.ViewModels.FullModels;
+using FacebookAPI.App_Code.ViewModels.PostModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -113,7 +116,7 @@ namespace FacebookAPI.Controllers
                     signIn
                     );
 
-                var apiUser = new UserViewModel(user, new JwtSecurityTokenHandler().WriteToken(token));
+                var apiUser = new UserApiModel(user, new JwtSecurityTokenHandler().WriteToken(token));
 
                 return Ok(apiUser);
             }
@@ -147,6 +150,48 @@ namespace FacebookAPI.Controllers
                 return InternalError(ex);
             }
         }
-        #endregion
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateUserAsync(int id, [FromBody] PostUserProfileViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return DisplayErrors();
+                }
+
+                if (!await _userService.UserExistsAsync(id))
+                {
+                    return NotFound(_userService.UserDoesNotExistsMessage);
+                }
+
+                if (!IsUserIdSame(id) && !IsAdmin)
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                if (await _userService.EmailExistsAsync(model.Email, id))
+                {
+                    return BadRequest(_userService.EmailExistsMessage);
+                }
+
+                if (await _userService.PhoneNumberExistsAsync(model.PhoneNumber, id))
+                {
+                    return BadRequest(_userService.PhoneNumberExistsMessage);
+                }
+
+                var coreUser = new CoreUser(id, model);
+
+                coreUser = await _userService.UpdateUserAsync(id, coreUser);
+
+                return Ok(new FullUserProfileViewModel(coreUser, _userService.UpdatePasswordSuccessMessage));
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+            #endregion
+        }
     }
 }

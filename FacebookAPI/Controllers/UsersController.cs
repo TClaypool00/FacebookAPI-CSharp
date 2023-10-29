@@ -114,7 +114,7 @@ namespace FacebookAPI.Controllers
                     _configuration["JWT:Audience"],
                     claims,
                     DateTime.UtcNow,
-                    DateTime.UtcNow.AddMinutes(10),
+                    DateTime.UtcNow.AddMinutes(int.Parse(_configuration["JWT:TimeoutLength"])),
                     signIn
                     );
 

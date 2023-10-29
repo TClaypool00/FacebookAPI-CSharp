@@ -36,7 +36,7 @@ namespace FacebookAPI.App_Code.ViewModels
         public PostViewModel(CorePost corePost, int userId, string userDisplayName)
         {
 
-            SetCorePostValues(corePost);
+            Construct(corePost);
             
             _userId = userId;
             _userDisplayName = userDisplayName;
@@ -45,24 +45,10 @@ namespace FacebookAPI.App_Code.ViewModels
 
         public PostViewModel(CorePost corePost)
         {
-            SetCorePostValues(corePost);
-
-            if (_corePost.User is not null)
-            {
-                UserId = _corePost.User.UserId;
-                _userDisplayName = _corePost.User.ProtectedName;
-            }
-
-            IsEdited = _corePost.IsEdited;
+            Construct(corePost);
         }
 
-        public void SetProperties(Tuple<int, bool> tuple)
-        {
-            LikeCount = tuple.Item1;
-            Liked = tuple.Item2;
-        }
-
-        private void SetCorePostValues(CorePost corePost)
+        private void Construct(CorePost corePost)
         {
             if (corePost is null)
             {
@@ -76,6 +62,7 @@ namespace FacebookAPI.App_Code.ViewModels
             DatePosted = _corePost.DatePostedString;
             LikeCount = _corePost.LikeCount;
             Liked = _corePost.Liked;
+            IsEdited = _corePost.IsEdited;
 
             if (_corePost.Comments is not null)
             {
@@ -85,6 +72,12 @@ namespace FacebookAPI.App_Code.ViewModels
                 {
                     Comments.Add(new CommentViewModel(_corePost.Comments[i]));
                 }
+            }
+
+            if (_corePost.User is not null)
+            {
+                UserId = _corePost.User.UserId;
+                _userDisplayName = _corePost.User.ProtectedName;
             }
         }
     }

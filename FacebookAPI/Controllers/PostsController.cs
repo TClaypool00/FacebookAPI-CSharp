@@ -41,7 +41,7 @@ namespace FacebookAPI.Controllers
                     return NotFound(_userService.UserDoesNotExistsMessage);
                 }
 
-                if (!IsUserIdSame(UseerId) && !IsAdmin)
+                if (!IsUserIdSame(UserId) && !IsAdmin)
                 {
                     return Unauthorized(UnAuthorizedMessage);
                 }
@@ -51,7 +51,7 @@ namespace FacebookAPI.Controllers
 
                 if (IsUserIdSame(model.UserId))
                 {
-                    corePost.User = new CoreUser(UseerId, FirstName, LastName);
+                    corePost.User = new CoreUser(UserId, FirstName, LastName);
                 }
                 else
                 {
@@ -88,7 +88,7 @@ namespace FacebookAPI.Controllers
                         return Unauthorized(UnAuthorizedMessage);
                     }
 
-                    if (!await _postService.UserHasAccessToPostAsync(id, UseerId))
+                    if (!await _postService.UserHasAccessToPostAsync(id, UserId))
                     {
                         return Unauthorized(_postService.UserDoesNotHaveAccessMessage);
                     }
@@ -104,7 +104,7 @@ namespace FacebookAPI.Controllers
 
                 if (IsUserIdSame(model.UserId))
                 {
-                    corePost.User = new CoreUser(UseerId, FirstName, LastName);
+                    corePost.User = new CoreUser(UserId, FirstName, LastName);
                 }
                 else
                 {
@@ -124,7 +124,7 @@ namespace FacebookAPI.Controllers
         {
             try
             {
-                if (!await _postService.UserHasAccessToPostAsync(id, UseerId) && !IsAdmin)
+                if (!await _postService.UserHasAccessToPostAsync(id, UserId) && !IsAdmin)
                 {
                     return Unauthorized(UnAuthorizedMessage);
                 }

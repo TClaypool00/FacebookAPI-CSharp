@@ -205,12 +205,12 @@ namespace FacebookAPI.Controllers
                     return DisplayErrors();
                 }
 
-                if (!await _userService.UserExistsAsync(UseerId))
+                if (!await _userService.UserExistsAsync(UserId))
                 {
                     return NotFound(_userService.UserDoesNotExistsMessage);
                 }
 
-                var user = await _userService.GetUserAsync(UseerId, true);
+                var user = await _userService.GetUserAsync(UserId, true);
 
                 if (!_passwordService.VerifyPassword(model.Password, user.Password))
                 {
@@ -224,7 +224,7 @@ namespace FacebookAPI.Controllers
 
                 model.NewPassword = _passwordService.HashPassword(model.NewPassword);
 
-                await _userService.UpdatePasswordAsync(UseerId, model.NewPassword);
+                await _userService.UpdatePasswordAsync(UserId, model.NewPassword);
 
                 return Ok(_userService.UpdatePasswordSuccessMessage);
             }

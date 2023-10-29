@@ -24,7 +24,7 @@ namespace FacebookAPI.Controllers
 
         #region Protected Properties
         #region User Claims
-        protected int UseerId
+        protected int UserId
         {
             get
             {
@@ -99,7 +99,7 @@ namespace FacebookAPI.Controllers
 
         protected bool IsUserIdSame(int userId)
         {
-            return userId == UseerId;
+            return userId == UserId;
         }
         #endregion
 

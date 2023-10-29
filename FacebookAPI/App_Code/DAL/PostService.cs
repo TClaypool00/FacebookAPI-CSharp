@@ -2,7 +2,6 @@
 using FacebookAPI.App_Code.BOL;
 using FacebookAPI.App_Code.CoreModels;
 using Microsoft.EntityFrameworkCore;
-using System.Xml.Linq;
 
 namespace FacebookAPI.App_Code.DAL
 {

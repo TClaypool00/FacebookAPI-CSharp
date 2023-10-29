@@ -21,6 +21,8 @@ namespace FacebookAPI.App_Code.ViewModels
             }
         }
 
+        public bool IsEdited { get; set; }
+
         public int LikeCount { get; set; }
         public bool Liked { get; set; }
 
@@ -50,6 +52,8 @@ namespace FacebookAPI.App_Code.ViewModels
                 UserId = _corePost.User.UserId;
                 _userDisplayName = _corePost.User.ProtectedName;
             }
+
+            IsEdited = _corePost.IsEdited;
         }
 
         public void SetProperties(Tuple<int, bool> tuple)

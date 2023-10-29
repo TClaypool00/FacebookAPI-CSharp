@@ -6,8 +6,8 @@ namespace FacebookAPI.App_Code.CoreModels
     public class CorePost
     {
         private Post _post;
-        private readonly int _userId;
-        private readonly PostPostViewModel _postViewModel;
+        private int _userId;
+        private PostPostViewModel _postViewModel;
         private DateTime _datePosted;
         private DateTime _dateUpdated;
 
@@ -59,6 +59,14 @@ namespace FacebookAPI.App_Code.CoreModels
 
         public bool Liked { get; set; }
 
+        public bool IsEdited
+        {
+            get
+            {
+                return _datePosted < _dateUpdated;
+            }
+        }
+
         public int UserId { get; set; }
         public CoreUser User { get; set; }
 
@@ -71,29 +79,26 @@ namespace FacebookAPI.App_Code.CoreModels
 
         public CorePost(PostPostViewModel model)
         {
-            if (model is null)
-            {
-                throw new ArgumentNullException(nameof(model));
-            }
+            Construct(model);
+        }
 
-            _postViewModel = model;
-            _userId = _postViewModel.UserId;
-
-            UserId = _userId;
-            PostBody = _postViewModel.PostBody;
+        public CorePost(PostPostViewModel model, int id)
+        {
+            Construct(model);
+            PostId = id;
         }
 
         public CorePost(Post post)
         {
-            SetPostValues(post);
+            Construct(post);
         }
 
         public void SetNewValues(Post post)
         {
-            SetPostValues(post);
+            Construct(post);
         }
 
-        private void SetPostValues(Post post)
+        private void Construct(Post post)
         {
             _post = post ?? throw new ArgumentNullException(nameof(post));
 
@@ -118,6 +123,20 @@ namespace FacebookAPI.App_Code.CoreModels
             {
                 User = new CoreUser(_post.User);
             }
+        }
+
+        private void Construct(PostPostViewModel model)
+        {
+            if (model is null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            _postViewModel = model;
+            _userId = _postViewModel.UserId;
+
+            UserId = _userId;
+            PostBody = _postViewModel.PostBody;
         }
     }
 }

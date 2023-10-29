@@ -12,6 +12,10 @@ namespace FacebookAPI.App_Code.DAL
         protected readonly IConfiguration _configuration;
         protected readonly int _longerTakeValue;
         protected readonly FacebookDbContext _context;
+        protected string _tableName;
+        protected readonly string _couldNotAddedMessage;
+        protected readonly string _doesNotExistMessage;
+        protected readonly string _doesNotHaveAccessMessage;
 
         public ServiceHelper(IConfiguration configuration, FacebookDbContext context)
         {
@@ -20,6 +24,10 @@ namespace FacebookAPI.App_Code.DAL
             _subTakeValue = int.Parse(_configuration.GetSection("app").GetSection("standardTakeValue").Value);
             _longerTakeValue = int.Parse(_configuration.GetSection("app").GetSection("longerTakeValue").Value);
             _context = context;
+            _couldNotAddedMessage = _configuration["messages:addError"];
+            _doesNotExistMessage = _configuration["messages:DoesNotExist"];
+            _doesNotHaveAccessMessage = _configuration["messages:DoesNotExist"];
+
         }
 
         protected void ConfigureIndex(int? index)

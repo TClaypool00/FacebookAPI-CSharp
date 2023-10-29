@@ -191,7 +191,46 @@ namespace FacebookAPI.Controllers
             {
                 return InternalError(ex);
             }
-            #endregion
         }
+        [HttpPut("ChangePassword")]
+        public async Task<ActionResult> ChangePasswordAsync([FromBody] PostChangePasswordViewModel model)
+        {
+            //TODO: Fix logic so it doesn't have to make 2 calls to the database
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return DisplayErrors();
+                }
+
+                if (!await _userService.UserExistsAsync(UseerId))
+                {
+                    return NotFound(_userService.UserDoesNotExistsMessage);
+                }
+
+                var user = await _userService.GetUserAsync(UseerId, true);
+
+                if (!_passwordService.VerifyPassword(model.Password, user.Password))
+                {
+                    return BadRequest(_passwordService.IncorrectPasswordMessage);
+                }
+
+                if (!_passwordService.PasswordMeetsRequirements(model.NewPassword))
+                {
+                    return BadRequest(_passwordService.PasswordDoesMeetRequirementsMessage);
+                }
+
+                model.NewPassword = _passwordService.HashPassword(model.NewPassword);
+
+                await _userService.UpdatePasswordAsync(UseerId, model.NewPassword);
+
+                return Ok(_userService.UpdatePasswordSuccessMessage);
+            }
+            catch (Exception e)
+            {
+                return InternalError(e);
+            }
+        }
+        #endregion
     }
 }

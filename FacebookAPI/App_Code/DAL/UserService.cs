@@ -161,16 +161,18 @@ namespace FacebookAPI.App_Code.DAL
             return _context.Users.AnyAsync(u => u.PhoneNumber == phoneNumber && u.UserId != id);
         }
 
-        public async Task<bool> UpdatePassword(CoreUser user)
+        public async Task UpdatePasswordAsync(int id, string newPassword)
         {
             try
             {
-                var dataUser = new User(user);
+                var dataUser = await FindFullUser(id);
+
+                dataUser.Password = newPassword;
                 _context.Users.Update(dataUser);
 
                 await SaveAsync();
 
-                return true;
+                DetachEntity(dataUser);
             }
             catch (Exception)
             {
@@ -209,6 +211,8 @@ namespace FacebookAPI.App_Code.DAL
                     await SaveAsync();
 
                     user.Profile.Gender = new CoreGender(dataUser.Profile.Gender);
+
+                    DetachEntity(dataUser);
 
                     return user;
                 }

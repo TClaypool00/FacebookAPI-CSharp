@@ -12,7 +12,7 @@ namespace FacebookAPI.App_Code.BLL
 
         public Task<bool> UserExistsAsync(int id);
 
-        public Task<bool> UpdatePassword(CoreUser user);
+        public Task UpdatePasswordAsync(int id, string newPassword);
 
         public Task<CoreUser> GetUserAsync(string email);
 

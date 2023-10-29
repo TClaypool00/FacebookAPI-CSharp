@@ -36,6 +36,11 @@ namespace FacebookAPI.Controllers
                     return DisplayErrors();
                 }
 
+                if (!await _userService.UserExistsAsync(model.UserId))
+                {
+                    return NotFound(_userService.UserDoesNotExistsMessage);
+                }
+
                 if (!IsUserIdSame(UseerId) && !IsAdmin)
                 {
                     return Unauthorized(UnAuthorizedMessage);
@@ -43,6 +48,59 @@ namespace FacebookAPI.Controllers
 
                 var corePost = new CorePost(model);
                 corePost = await _postService.AddPostAsync(corePost);
+
+                if (IsUserIdSame(model.UserId))
+                {
+                    corePost.User = new CoreUser(UseerId, FirstName, LastName);
+                }
+                else
+                {
+                    corePost.User = await _userService.GetUserAsync(model.UserId);
+                }
+
+                return Ok(new PostViewModel(corePost));
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdatePostAsync(int id, [FromBody] PostPostViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return DisplayErrors();
+                }
+
+                if (IsAdmin && !await _postService.PostExistsAsync(id))
+                {
+                    return NotFound(_postService.PostDoesNotExistMessage);
+                }
+
+                if (!IsAdmin)
+                {
+                    if (!IsUserIdSame(model.UserId))
+                    {
+                        return Unauthorized(UnAuthorizedMessage);
+                    }
+
+                    if (!await _postService.UserHasAccessToPostAsync(id, UseerId))
+                    {
+                        return Unauthorized(_postService.UserDoesNotHaveAccessMessage);
+                    }
+                }
+
+                if (!await _userService.UserExistsAsync(model.UserId))
+                {
+                    return NotFound(_userService.UserDoesNotExistsMessage);
+                }
+
+                var corePost = new CorePost(model, id);
+                corePost = await _postService.UpdatePostAsync(corePost);
 
                 if (IsUserIdSame(model.UserId))
                 {

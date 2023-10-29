@@ -7,9 +7,13 @@ namespace FacebookAPI.App_Code.DAL
 {
     public class PostService : ServiceHelper, IPostService
     {
+        public string PostDoesNotExistMessage => $"{_tableName} {_doesNotExistMessage}";
+
+        public string UserDoesNotHaveAccessMessage => $"{_doesNotHaveAccessMessage} {_tableName}";
+
         public PostService(FacebookDbContext context, IConfiguration configuration) : base(configuration, context)
         {
-
+            _tableName = _configuration["tableNames:Post"];
         }
 
         public async Task<CorePost> AddPostAsync(CorePost post)
@@ -24,7 +28,7 @@ namespace FacebookAPI.App_Code.DAL
 
                 if (dataPost.PostId == 0)
                 {
-                    throw new ApplicationException("Post could not be added");
+                    throw new ApplicationException($"{_tableName} ");
                 }
 
                 post.SetNewValues(dataPost);
@@ -224,6 +228,41 @@ namespace FacebookAPI.App_Code.DAL
                 })
                 .Take(_takeValue)
                 .ToListAsync();
+        }
+
+        public Task<bool> PostExistsAsync(int id)
+        {
+            return _context.Posts.AnyAsync(p => p.PostId == id);
+        }
+
+        public Task<bool> UserHasAccessToPostAsync(int id, int userId)
+        {
+            return _context.Posts.AnyAsync(p => p.PostId == id && p.UserId == userId);
+        }
+
+        public async Task<CorePost> UpdatePostAsync(CorePost post)
+        {
+            try
+            {
+                var dataPost = await FindPostByIdAsync(post.PostId);
+                dataPost.PostBody = post.PostBody;
+
+                _context.Posts.Update(dataPost);
+                await SaveAsync();
+
+                post.DateUpdated = dataPost.DateUpdated;
+
+                return post;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        private Task<Post> FindPostByIdAsync(int id)
+        {
+            return _context.Posts.FirstOrDefaultAsync(p => p.PostId == id);
         }
     }
 }

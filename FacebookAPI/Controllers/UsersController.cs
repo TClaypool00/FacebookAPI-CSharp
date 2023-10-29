@@ -100,6 +100,8 @@ namespace FacebookAPI.Controllers
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                     new Claim("UserId", user.UserId.ToString()),
+                    new Claim("FirstName", user.FirstName),
+                    new Claim("LastName", user.LastName),
                     new Claim("PhoneNumber", user.PhoneNumber),
                     new Claim("Email", user.Email),
                     new Claim("IsAdmin", user.IsAdmin.ToString())

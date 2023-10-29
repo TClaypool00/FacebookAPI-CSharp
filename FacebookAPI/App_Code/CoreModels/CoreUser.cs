@@ -122,6 +122,13 @@ namespace FacebookAPI.App_Code.CoreModels
             Profile = new CoreProfile(_postUserProfileViewModel);
         }
 
+        public CoreUser(int userId,string firstName, string lastName)
+        {
+            UserId = userId;
+            FirstName = firstName;
+            LastName = lastName;
+        }
+
         private void Construct(User user)
         {
             if (user is null)

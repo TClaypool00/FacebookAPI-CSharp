@@ -32,6 +32,22 @@ namespace FacebookAPI.Controllers
             }
         }
 
+        protected string FirstName
+        {
+            get
+            {
+                return User.Claims.FirstOrDefault(c => c.Type == "FirstName").Value;
+            }
+        }
+
+        protected string LastName
+        {
+            get
+            {
+                return User.Claims.FirstOrDefault(c => c.Type == "LastName").Value;
+            }
+        }
+
         protected bool IsAdmin
         {
             get

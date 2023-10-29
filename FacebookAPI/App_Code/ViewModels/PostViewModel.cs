@@ -6,19 +6,9 @@ namespace FacebookAPI.App_Code.ViewModels
     public class PostViewModel : PostPostViewModel
     {
         private CorePost _corePost;
-        private int _userId;
         private string _userDisplayName;
 
         public int PostId { get; set; }
-
-        public int UserId
-        {
-            get { return _userId; }
-            set
-            {
-                _userId = value;
-            }
-        }
 
         public string DatePosted { get; set; }
 

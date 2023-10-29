@@ -69,7 +69,7 @@ namespace FacebookAPI.App_Code.CoreModels
 
         }
 
-        public CorePost(PostPostViewModel model, int userId)
+        public CorePost(PostPostViewModel model)
         {
             if (model is null)
             {
@@ -77,7 +77,7 @@ namespace FacebookAPI.App_Code.CoreModels
             }
 
             _postViewModel = model;
-            _userId = userId;
+            _userId = _postViewModel.UserId;
 
             UserId = _userId;
             PostBody = _postViewModel.PostBody;

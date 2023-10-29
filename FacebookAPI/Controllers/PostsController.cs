@@ -138,6 +138,40 @@ namespace FacebookAPI.Controllers
                 return InternalError(ex);
             }
         }
+
+        [HttpGet]
+        public async Task<ActionResult> GetAllPosts([FromQuery] int userId, int? index = null, bool? includeComments = null)
+        {
+            try
+            {
+                if (!IsAdmin && !IsUserIdSame(userId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                var corePosts = await _postService.GetAllPostsAsync(userId, index, includeComments);
+                
+                if (corePosts.Count > 0)
+                {
+                    var postViewModels = new List<PostViewModel>();
+
+                    for (int i = 0; i < corePosts.Count; i++)
+                    {
+                        postViewModels.Add(new PostViewModel(corePosts[i]));
+                    }
+
+                    return Ok(postViewModels);
+                } else
+                {
+                    return NotFound(_postService.NoPostsFoundMessage);
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
         #endregion
     }
 }

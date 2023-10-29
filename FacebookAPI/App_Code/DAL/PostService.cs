@@ -11,6 +11,8 @@ namespace FacebookAPI.App_Code.DAL
 
         public string UserDoesNotHaveAccessMessage => $"{_doesNotHaveAccessMessage} {_tableName}";
 
+        public string NoPostsFoundMessage => _configuration["NotFoundMessages:Posts"];
+
         public PostService(FacebookDbContext context, IConfiguration configuration) : base(configuration, context)
         {
             _tableName = _configuration["tableNames:Post"];
@@ -41,7 +43,7 @@ namespace FacebookAPI.App_Code.DAL
             }
         }
 
-        public async Task<List<CorePost>> GetAllPostsAsync(int? index = null, int?userId = null, bool includeComments = true)
+        public async Task<List<CorePost>> GetAllPostsAsync(int userId, int? index = null, bool? includeComments = null)
         {
             ConfigureIndex(index);
 
@@ -49,31 +51,7 @@ namespace FacebookAPI.App_Code.DAL
             List<Comment> comments = null;
             List<Post> posts;
 
-            if (userId is null)
-            {
-                posts = await _context.Posts
-                    .Select(p => new Post
-                    {
-                        PostId = p.PostId,
-                        PostBody = p.PostBody,
-                        DatePosted = p.DatePosted,
-                        DateUpdated = p.DateUpdated,
-                        User = new User
-                        {
-                            UserId = p.User.UserId,
-                            FirstName = p.User.FirstName,
-                            LastName = p.User.LastName
-                        },
-                        LikeCount = p.Likes.Where(a => a.UserId == userId && a.PostId == p.PostId).Count(),
-                        Liked = p.Likes.Any(a => a.UserId == userId && a.PostId == p.PostId)
-                    })
-                    .Take(_takeValue)
-                    .Skip(_index)
-                    .ToListAsync();
-            }
-            else
-            {
-                posts = await _context.Posts
+            posts = await _context.Posts
                     .Where(a => a.User.UserId == userId)
                     .Select(p => new Post
                     {
@@ -93,11 +71,10 @@ namespace FacebookAPI.App_Code.DAL
                     .Take(_takeValue)
                     .Skip(_index)
                     .ToListAsync();
-            }
 
             var postIds = PostIdsList(posts);
 
-            if (includeComments)
+            if (includeComments == true)
             {
                 comments = await FindComments(postIds);
             }
@@ -106,7 +83,7 @@ namespace FacebookAPI.App_Code.DAL
             {
                 var post = posts[i];
 
-                if (includeComments)
+                if (includeComments == true)
                 {
                     post.Comments = comments.Where(a => a.PostId == post.PostId).ToList();
                 }

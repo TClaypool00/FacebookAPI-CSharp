@@ -244,7 +244,7 @@ namespace FacebookAPI.App_Code.DAL
         {
             try
             {
-                var dataPost = await FindPostByIdAsync(post.PostId);
+                var dataPost = await FindPostByIdAsync(post.PostId, false);
                 dataPost.PostBody = post.PostBody;
 
                 _context.Posts.Update(dataPost);
@@ -260,9 +260,34 @@ namespace FacebookAPI.App_Code.DAL
             }
         }
 
-        private Task<Post> FindPostByIdAsync(int id)
+        public async Task<CorePost> GetPostByIdAsync(int id)
         {
-            return _context.Posts.FirstOrDefaultAsync(p => p.PostId == id);
+            var dataPost = await FindPostByIdAsync(id);
+
+            return new CorePost(dataPost);
+        }
+
+        private Task<Post> FindPostByIdAsync(int id, bool includeUser = true)
+        {
+            if (!includeUser)
+            {
+                return _context.Posts.FirstOrDefaultAsync(p => p.PostId == id);
+            }
+            else
+            {
+                return _context.Posts.Select(p => new Post
+                {
+                    PostId = p.PostId,
+                    PostBody = p.PostBody,
+                    DatePosted = p.DatePosted,
+                    User = new User
+                    {
+                        UserId = p.User.UserId,
+                        FirstName = p.User.FirstName,
+                        LastName = p.User.LastName,
+                    }
+                }).FirstOrDefaultAsync(a => a.PostId == id);
+            }
         }
     }
 }

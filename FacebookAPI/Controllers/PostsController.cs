@@ -118,6 +118,26 @@ namespace FacebookAPI.Controllers
                 return InternalError(ex);
             }
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetPostAsync(int id)
+        {
+            try
+            {
+                if (!await _postService.UserHasAccessToPostAsync(id, UseerId) && !IsAdmin)
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                var corePost = await _postService.GetPostByIdAsync(id);
+
+                return Ok(new PostViewModel(corePost));
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
         #endregion
     }
 }

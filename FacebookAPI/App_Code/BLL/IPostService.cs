@@ -9,6 +9,8 @@ namespace FacebookAPI.App_Code.BLL
 
         public Task<CorePost> UpdatePostAsync(CorePost post);
 
+        public Task<CorePost> GetPostByIdAsync(int id);
+
         public Task<List<CorePost>> GetAllPostsAsync(int? index = null, int? userId = null, bool includeComments = true);
 
         public Task<List<CorePost>> GetFriendsPostsAsync(int userId, int? index = null);

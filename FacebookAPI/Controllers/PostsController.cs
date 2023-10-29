@@ -1,4 +1,5 @@
 ﻿using FacebookAPI.App_Code.BLL;
+using FacebookAPI.App_Code.BOL;
 using FacebookAPI.App_Code.CoreModels;
 using FacebookAPI.App_Code.ViewModels;
 using FacebookAPI.App_Code.ViewModels.PostModels;
@@ -197,6 +198,32 @@ namespace FacebookAPI.Controllers
                 }
 
                 return Ok(postViewModels);
+
+            }
+            catch (Exception exception)
+            {
+                return InternalError(exception);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeletePostAsync(int id)
+        {
+            try
+            {
+                if (!IsAdmin && !await _postService.UserHasAccessToPostAsync(id, UserId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                if (IsAdmin && !await _postService.PostExistsAsync(id))
+                {
+                    return NotFound(_postService.PostDoesNotExistMessage);
+                }
+
+                await _postService.DeletePostAsync(id);
+
+                return Ok(_postService.PostDeletedMessage);
 
             }
             catch (Exception exception)

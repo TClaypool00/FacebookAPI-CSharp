@@ -13,6 +13,8 @@ namespace FacebookAPI.App_Code.DAL
 
         public string NoPostsFoundMessage => _configuration["NotFoundMessages:Posts"];
 
+        public string PostDeletedMessage => $"{_tableName} {_deletedMessage}";
+
         public PostService(FacebookDbContext context, IConfiguration configuration) : base(configuration, context)
         {
             _tableName = _configuration["tableNames:Post"];
@@ -242,6 +244,15 @@ namespace FacebookAPI.App_Code.DAL
             var dataPost = await FindPostByIdAsync(id);
 
             return new CorePost(dataPost);
+        }
+
+        public async Task DeletePostAsync(int id)
+        {
+            var dataPost = await FindPostByIdAsync(id, false);
+
+            _context.Posts.Remove(dataPost);
+
+            await SaveAsync();
         }
 
         private Task<Post> FindPostByIdAsync(int id, bool includeUser = true)

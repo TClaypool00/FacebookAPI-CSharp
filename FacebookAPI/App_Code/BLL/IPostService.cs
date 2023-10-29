@@ -18,12 +18,15 @@ namespace FacebookAPI.App_Code.BLL
         public Task<bool> PostExistsAsync(int id);
 
         public Task<bool> UserHasAccessToPostAsync(int id, int userId);
+
+        public Task DeletePostAsync(int id);
         #endregion
 
         #region Public Properties
         public string PostDoesNotExistMessage { get; }
         public string UserDoesNotHaveAccessMessage { get; }
         public string NoPostsFoundMessage { get; }
+        public string PostDeletedMessage { get; }
         #endregion
     }
 }

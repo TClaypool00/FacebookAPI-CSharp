@@ -16,6 +16,7 @@ namespace FacebookAPI.App_Code.DAL
         protected readonly string _couldNotAddedMessage;
         protected readonly string _doesNotExistMessage;
         protected readonly string _doesNotHaveAccessMessage;
+        protected readonly string _deletedMessage;
 
         public ServiceHelper(IConfiguration configuration, FacebookDbContext context)
         {
@@ -27,6 +28,7 @@ namespace FacebookAPI.App_Code.DAL
             _couldNotAddedMessage = _configuration["messages:addError"];
             _doesNotExistMessage = _configuration["messages:DoesNotExist"];
             _doesNotHaveAccessMessage = _configuration["messages:DoesNotExist"];
+            _deletedMessage = _configuration["messages:Deleted"];
 
         }
 

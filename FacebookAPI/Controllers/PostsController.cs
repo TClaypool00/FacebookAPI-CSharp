@@ -151,25 +151,57 @@ namespace FacebookAPI.Controllers
 
                 var corePosts = await _postService.GetAllPostsAsync(userId, index, includeComments);
                 
-                if (corePosts.Count > 0)
-                {
-                    var postViewModels = new List<PostViewModel>();
-
-                    for (int i = 0; i < corePosts.Count; i++)
-                    {
-                        postViewModels.Add(new PostViewModel(corePosts[i]));
-                    }
-
-                    return Ok(postViewModels);
-                } else
+                if (corePosts.Count == 0)
                 {
                     return NotFound(_postService.NoPostsFoundMessage);
                 }
-                
+
+                var postViewModels = new List<PostViewModel>();
+
+                for (int i = 0; i < corePosts.Count; i++)
+                {
+                    postViewModels.Add(new PostViewModel(corePosts[i]));
+                }
+
+                return Ok(postViewModels);
+
             }
             catch (Exception ex)
             {
                 return InternalError(ex);
+            }
+        }
+
+        [HttpGet("GetFriendsPosts")]
+        public async Task<ActionResult> GetFriendsPosts(int userId, int? index = null)
+        {
+            try
+            {
+                if (!IsAdmin && !IsUserIdSame(userId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                var corePosts = await _postService.GetFriendsPostsAsync(userId, index);
+
+                if (corePosts.Count == 0)
+                {
+                    return NotFound(_postService.NoPostsFoundMessage);
+                }
+
+                var postViewModels = new List<PostViewModel>();
+
+                for (int i = 0; i < corePosts.Count; i++)
+                {
+                    postViewModels.Add(new PostViewModel(corePosts[i]));
+                }
+
+                return Ok(postViewModels);
+
+            }
+            catch (Exception exception)
+            {
+                return InternalError(exception);
             }
         }
         #endregion

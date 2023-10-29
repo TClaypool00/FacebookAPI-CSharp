@@ -19,13 +19,6 @@ namespace FacebookAPI.App_Code.ViewModels
         {
             Construct(coreUser);
         }
-
-        public UserViewModel(CoreUser coreUser, string token)
-        {
-            Construct(coreUser);
-
-            Token = token;
-        }
         #endregion
 
         #region Public Properties
@@ -48,8 +41,6 @@ namespace FacebookAPI.App_Code.ViewModels
         public string PhoneNumber { get; set; }
 
         public bool IsAdmin { get; set; }
-
-        public string Token { get; set; }
         #endregion
 
         #region Private methods

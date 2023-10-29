@@ -7,6 +7,7 @@ namespace FacebookAPI.App_Code.CoreModels
     public class CoreUser
     {
         private readonly RegisterViewModel _registerViewModel;
+        private readonly PostUserProfileViewModel _postUserProfileViewModel;
         private User _user;
         private IConfiguration _configuration;
         private readonly int _currentUserId;
@@ -36,7 +37,13 @@ namespace FacebookAPI.App_Code.CoreModels
 
         public string PhoneNumber { get; set; }
 
-        public string ProtectedName { get; set; }
+        public string ProtectedName
+        {
+            get
+            {
+                return $"{FirstName} {LastName[0]}.";
+            }
+        }
 
         public bool IsAdmin { get; set; }
 
@@ -90,9 +97,9 @@ namespace FacebookAPI.App_Code.CoreModels
             Profile = new CoreProfile(_registerViewModel, this);
         }
 
-        public CoreUser(User usr, IConfiguration configuration)
+        public CoreUser(User user, IConfiguration configuration)
         {
-            Construct(usr, configuration);
+            Construct(user, configuration);
         }
 
         public CoreUser(User user, int currentUserId, IConfiguration configuration)
@@ -102,16 +109,17 @@ namespace FacebookAPI.App_Code.CoreModels
             _currentUserId = currentUserId;
         }
 
-        public void SetProperites(PostUserProfileViewModel model)
+        public CoreUser(int id, PostUserProfileViewModel postUserProfileViewModel)
         {
-            FirstName = model.FirstName;
-            Profile.MiddleName = model.MiddleName;
-            LastName = model.LastName;
-            Email = model.Email;
-            PhoneNumber= model.PhoneNumber;
-            Profile.BirthDate = model.BirthDateDate;
-            Profile.GenderId = model.GenderId;
-            Profile.AboutMe = model.AboutMe;
+            _postUserProfileViewModel = postUserProfileViewModel ?? throw new ArgumentNullException(nameof(postUserProfileViewModel));
+
+            UserId = id;
+            FirstName = _postUserProfileViewModel.FirstName;
+            LastName = _postUserProfileViewModel.LastName;
+            Email = _postUserProfileViewModel.Email;
+            PhoneNumber = _postUserProfileViewModel.PhoneNumber;
+            IsAdmin = _postUserProfileViewModel.IsAdmin;
+            Profile = new CoreProfile(_postUserProfileViewModel);
         }
 
         private void Construct(User user)
@@ -130,7 +138,6 @@ namespace FacebookAPI.App_Code.CoreModels
             PhoneNumber = _user.PhoneNumber;
             Password = _user.Password;
             IsAdmin = _user.IsAdmin;
-            ProtectedName = $"{_user.FirstName} {_user.LastName[0]}.";
 
             if (_user.Profile is not null)
             {

@@ -1,11 +1,13 @@
 ﻿using FacebookAPI.App_Code.BOL;
 using FacebookAPI.App_Code.ViewModels;
+using FacebookAPI.App_Code.ViewModels.PostModels;
 
 namespace FacebookAPI.App_Code.CoreModels
 {
     public class CoreProfile
     {
         private readonly RegisterViewModel _registerViewModel;
+        private readonly PostUserProfileViewModel _postUserProfileViewModel;
         private readonly CoreUser _coreUser;
         private readonly Profile _profile;
         private string _middleName;
@@ -56,6 +58,17 @@ namespace FacebookAPI.App_Code.CoreModels
             GenderId = (int)_registerViewModel.GenderId;
             _coreUser = coreUser;
             User = _coreUser;
+        }
+
+        public CoreProfile(PostUserProfileViewModel postUserProfileViewModel)
+        {
+            _postUserProfileViewModel = postUserProfileViewModel ?? throw new ArgumentNullException(nameof(postUserProfileViewModel));
+
+            ProfileId = _postUserProfileViewModel.ProfileId;
+            AboutMe = _postUserProfileViewModel.AboutMe;
+            BirthDate = _postUserProfileViewModel.BirthDateDate;
+            MiddleName = _postUserProfileViewModel.MiddleName;
+            GenderId = _postUserProfileViewModel.GenderId;
         }
 
         public int ProfileId { get; set; }

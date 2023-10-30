@@ -109,7 +109,7 @@ namespace FacebookAPI.Controllers
                 }
                 else
                 {
-                    corePost.User = await _userService.GetUserAsync(model.UserId);
+                    corePost.User = await _userService.GetFullNameAsync(model.UserId);
                 }
 
                 return Ok(new PostViewModel(corePost));

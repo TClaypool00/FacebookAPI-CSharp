@@ -22,6 +22,8 @@ namespace FacebookAPI.App_Code.BLL
 
         public Task<CoreUser> UpdateUserAsync(int id, CoreUser user);
 
+        public Task<CoreUser> GetFullNameAsync(int id);
+
         public Task<List<CoreUser>> GetFriendsAsync(string search, int userId);
 
 

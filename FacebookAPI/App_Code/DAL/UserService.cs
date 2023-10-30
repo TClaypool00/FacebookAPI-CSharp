@@ -233,6 +233,19 @@ namespace FacebookAPI.App_Code.DAL
             return _context.Users.AnyAsync(u => u.UserId == id);
         }
 
+        public async Task<CoreUser> GetFullNameAsync(int id)
+        {
+            var dataUser = await _context.Users
+                .Select(u => new User
+                {
+                    UserId = u.UserId,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName
+                }).FirstOrDefaultAsync(a => a.UserId == id);
+
+            return new CoreUser(dataUser);
+        }
+
         private Task<User> FindUserAsync(int id, bool includePicture = false)
         {
             if (!includePicture)

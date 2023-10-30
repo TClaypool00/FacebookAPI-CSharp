@@ -29,8 +29,6 @@ namespace FacebookAPI.App_Code.ViewModels
 
         public int CommentId { get; set; }
 
-        public int UserId { get; set; }
-
         public string UserDisplayName
         {
             get
@@ -58,6 +56,7 @@ namespace FacebookAPI.App_Code.ViewModels
             CommentBody = _coreComment.CommentBody;
             UserId = _coreComment.UserId;            
             DatePosted = _coreComment.DatePostedString;
+            PostId = _coreComment.PostId;
         }
     }
 }

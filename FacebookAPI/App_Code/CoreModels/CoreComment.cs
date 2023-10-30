@@ -73,7 +73,7 @@ namespace FacebookAPI.App_Code.CoreModels
             }
         }
 
-        public CoreComment(PostCommentViewModel postComentModel, int userId)
+        public CoreComment(PostCommentViewModel postComentModel)
         {
             if (postComentModel is null)
             {
@@ -84,7 +84,7 @@ namespace FacebookAPI.App_Code.CoreModels
 
             CommentBody = _postComentModel.CommentBody;
             PostId = _postComentModel.PostId;
-            _userId = userId;
+            _userId = _postComentModel.UserId;
         }
     }
 }

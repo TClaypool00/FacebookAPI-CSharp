@@ -6,10 +6,12 @@ namespace FacebookAPI.App_Code.ViewModels.PostModels
     {
         [Required(ErrorMessage = "Comment body is required")]
         [MaxLength(255, ErrorMessage = "Comment body has max length of 255")]
-        [Display(Name = "Write a comment")]
         public string CommentBody { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Post Id is required")]
         public int PostId { get; set; }
+
+        [Required(ErrorMessage = "User Id is required")]
+        public int UserId { get; set; }
     }
 }

@@ -4,13 +4,11 @@ using FacebookAPI.App_Code.CoreModels;
 
 namespace FacebookAPI.App_Code.DAL
 {
-    public class CommentService : ICommentService
+    public class CommentService : ServiceHelper, ICommentService
     {
-        private readonly FacebookDbContext _context;
-
-        public CommentService(FacebookDbContext context)
+        public CommentService(IConfiguration configuration, FacebookDbContext context) : base(configuration, context)
         {
-            _context = context;
+            _tableName = _configuration["tableNames:Comments"];
         }
 
         public async Task<CoreComment> AddCommentAsync(CoreComment comment)
@@ -22,18 +20,13 @@ namespace FacebookAPI.App_Code.DAL
 
             if (dataComment.CommentId == 0)
             {
-                throw new ApplicationException("Could not add post");
+                throw new ApplicationException($"{_tableName} {_couldNotAddedMessage}");
             }
 
             comment.CommentId = dataComment.CommentId;
             comment.DatePosted = dataComment.DatePosted;
 
             return comment;
-        }
-
-        private async Task SaveAsync()
-        {
-            await _context.SaveChangesAsync();
         }
     }
 }

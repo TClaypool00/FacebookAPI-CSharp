@@ -7,6 +7,7 @@ namespace FacebookAPI.App_Code.DAL
 {
     public class PostService : ServiceHelper, IPostService
     {
+        #region Public Properties
         public string PostDoesNotExistMessage => $"{_tableName} {_doesNotExistMessage}";
 
         public string UserDoesNotHaveAccessMessage => $"{_doesNotHaveAccessMessage} {_tableName}";
@@ -14,12 +15,16 @@ namespace FacebookAPI.App_Code.DAL
         public string NoPostsFoundMessage => _configuration["NotFoundMessages:Posts"];
 
         public string PostDeletedMessage => $"{_tableName} {_deletedMessage}";
+        #endregion
 
+        #region Constructors
         public PostService(FacebookDbContext context, IConfiguration configuration) : base(configuration, context)
         {
             _tableName = _configuration["tableNames:Post"];
         }
+        #endregion
 
+        #region Public Methods
         public async Task<CorePost> AddPostAsync(CorePost post)
         {
             try
@@ -148,6 +153,59 @@ namespace FacebookAPI.App_Code.DAL
 
         }
 
+        public Task<bool> PostExistsAsync(int id)
+        {
+            return _context.Posts.AnyAsync(p => p.PostId == id);
+        }
+
+        public Task<bool> UserHasAccessToPostAsync(int id, int userId)
+        {
+            return _context.Posts.AnyAsync(p => p.PostId == id && p.UserId == userId);
+        }
+
+        public async Task<CorePost> UpdatePostAsync(CorePost post)
+        {
+            try
+            {
+                var dataPost = await FindPostByIdAsync(post.PostId, false);
+                dataPost.PostBody = post.PostBody;
+
+                _context.Posts.Update(dataPost);
+                await SaveAsync();
+
+                post.DateUpdated = dataPost.DateUpdated;
+
+                return post;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<CorePost> GetPostByIdAsync(int id, bool? includeComments = null)
+        {
+            var dataPost = await FindPostByIdAsync(id);
+
+            if (includeComments == true)
+            {
+                dataPost.Comments = await FindCommentsByPostId(id);
+            }
+
+            return new CorePost(dataPost);
+        }
+
+        public async Task DeletePostAsync(int id)
+        {
+            var dataPost = await FindPostByIdAsync(id, false);
+
+            _context.Posts.Remove(dataPost);
+
+            await SaveAsync();
+        }
+        #endregion
+
+        #region Private Methods
         private static List<int> PostIdsList(List<Post> posts)
         {
             var postIds = new List<int>();
@@ -209,57 +267,6 @@ namespace FacebookAPI.App_Code.DAL
                 .ToListAsync();
         }
 
-        public Task<bool> PostExistsAsync(int id)
-        {
-            return _context.Posts.AnyAsync(p => p.PostId == id);
-        }
-
-        public Task<bool> UserHasAccessToPostAsync(int id, int userId)
-        {
-            return _context.Posts.AnyAsync(p => p.PostId == id && p.UserId == userId);
-        }
-
-        public async Task<CorePost> UpdatePostAsync(CorePost post)
-        {
-            try
-            {
-                var dataPost = await FindPostByIdAsync(post.PostId, false);
-                dataPost.PostBody = post.PostBody;
-
-                _context.Posts.Update(dataPost);
-                await SaveAsync();
-
-                post.DateUpdated = dataPost.DateUpdated;
-
-                return post;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task<CorePost> GetPostByIdAsync(int id, bool? includeComments = null)
-        {
-            var dataPost = await FindPostByIdAsync(id);
-
-            if (includeComments == true)
-            {
-                dataPost.Comments = await FindCommentsByPostId(id);
-            }
-
-            return new CorePost(dataPost);
-        }
-
-        public async Task DeletePostAsync(int id)
-        {
-            var dataPost = await FindPostByIdAsync(id, false);
-
-            _context.Posts.Remove(dataPost);
-
-            await SaveAsync();
-        }
-
         private Task<Post> FindPostByIdAsync(int id, bool includeUser = true)
         {
             if (!includeUser)
@@ -304,5 +311,6 @@ namespace FacebookAPI.App_Code.DAL
                 .Skip(_index)
                 .ToListAsync();
         }
+        #endregion
     }
 }

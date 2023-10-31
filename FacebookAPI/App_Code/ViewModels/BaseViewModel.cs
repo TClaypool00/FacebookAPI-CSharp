@@ -4,6 +4,13 @@ namespace FacebookAPI.App_Code.ViewModels
 {
     public abstract class BaseViewModel
     {
+        #region Constructors
+        public BaseViewModel()
+        {
+            _message = "";
+        }
+        #endregion
+
         #region Protected fields
         protected string _userDisplayName;
         protected string _datePosted;

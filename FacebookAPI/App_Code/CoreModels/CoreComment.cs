@@ -1,54 +1,21 @@
 ﻿using FacebookAPI.App_Code.BOL;
+using FacebookAPI.App_Code.CoreModels.BaseCoreModels;
 using FacebookAPI.App_Code.ViewModels.PostModels;
 
 namespace FacebookAPI.App_Code.CoreModels
 {
-    public class CoreComment
+    public class CoreComment : BaseCoreModel
     {
-        private readonly PostCommentViewModel _postComentModel;
+        #region Private fields
+        private PostCommentViewModel _postComentModel;
+
+        #region Read-Only
         private readonly Comment _comment;
-        private int _userId;
+        #endregion
+        #endregion
 
-        public int CommentId { get; set; }
 
-        public string CommentBody { get; set; }
-
-        public DateTime DatePosted { get; set; }
-
-        public string DatePostedString
-        {
-            get
-            {
-                return DatePosted.ToString("f");
-            }
-        }
-
-        public DateTime DateUpdated { get; set; }
-
-        public string DateUpdatedString
-        {
-            get
-            {
-                return DateUpdated.ToString("f");
-            }
-        }
-
-        public int PostId { get; set; }
-        public CorePost Post { get; set; }
-
-        public int UserId
-        {
-            get
-            {
-                return _userId;
-            }
-            set
-            {
-                _userId = value;
-            }
-        }
-        public CoreUser User { get; set; }
-
+        #region Constructors
         public CoreComment()
         {
 
@@ -75,6 +42,29 @@ namespace FacebookAPI.App_Code.CoreModels
 
         public CoreComment(PostCommentViewModel postComentModel)
         {
+            Construct(postComentModel);
+        }
+
+        public CoreComment(PostCommentViewModel postComentModel, int id)
+        {
+            Construct(postComentModel);
+
+            CommentId = id;
+        }
+        #endregion
+
+        #region Public Properties
+        public int CommentId { get; set; }
+
+        public string CommentBody { get; set; }
+
+        public int PostId { get; set; }
+        public CorePost Post { get; set; }
+        #endregion
+
+        #region Private methods
+        private void Construct(PostCommentViewModel postComentModel)
+        {
             if (postComentModel is null)
             {
                 throw new ArgumentNullException(nameof(postComentModel));
@@ -86,5 +76,6 @@ namespace FacebookAPI.App_Code.CoreModels
             PostId = _postComentModel.PostId;
             _userId = _postComentModel.UserId;
         }
+        #endregion
     }
 }

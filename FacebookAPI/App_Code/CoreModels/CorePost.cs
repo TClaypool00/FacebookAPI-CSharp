@@ -1,77 +1,17 @@
 ﻿using FacebookAPI.App_Code.BOL;
+using FacebookAPI.App_Code.CoreModels.BaseCoreModels;
 using FacebookAPI.App_Code.ViewModels.PostModels;
 
 namespace FacebookAPI.App_Code.CoreModels
 {
-    public class CorePost
+    public class CorePost : BaseCoreModel
     {
+        #region Private fields
         private Post _post;
-        private int _userId;
         private PostPostViewModel _postViewModel;
-        private DateTime _datePosted;
-        private DateTime _dateUpdated;
+        #endregion
 
-        public int PostId { get; set; }
-
-        public string PostBody { get; set; }
-
-        public DateTime DatePosted
-        {
-            get
-            {
-                return _datePosted;
-            }
-            set
-            {
-                _datePosted = value;
-            }
-        }
-
-        public string DatePostedString
-        {
-            get
-            {
-                return _datePosted.ToString("f");
-            }
-        }
-
-        public DateTime DateUpdated
-        {
-            get
-            {
-                return _dateUpdated;
-            }
-            set
-            {
-                _dateUpdated = value;
-            }
-        }
-
-        public string DateUpdatedString
-        {
-            get
-            {
-                return DateUpdated.ToString("f");
-            }
-        }
-
-        public int LikeCount { get; set; }
-
-        public bool Liked { get; set; }
-
-        public bool IsEdited
-        {
-            get
-            {
-                return _datePosted < _dateUpdated;
-            }
-        }
-
-        public int UserId { get; set; }
-        public CoreUser User { get; set; }
-
-        public List<CoreComment> Comments { get; set; }
-
+        #region Constructors
         public CorePost()
         {
 
@@ -92,12 +32,17 @@ namespace FacebookAPI.App_Code.CoreModels
         {
             Construct(post);
         }
+        #endregion
 
-        public void SetNewValues(Post post)
-        {
-            Construct(post);
-        }
+        #region Public Properties
+        public int PostId { get; set; }
 
+        public string PostBody { get; set; }
+
+        public List<CoreComment> Comments { get; set; }
+        #endregion
+
+        #region Private methods
         private void Construct(Post post)
         {
             _post = post ?? throw new ArgumentNullException(nameof(post));
@@ -138,5 +83,6 @@ namespace FacebookAPI.App_Code.CoreModels
             UserId = _userId;
             PostBody = _postViewModel.PostBody;
         }
+        #endregion
     }
 }

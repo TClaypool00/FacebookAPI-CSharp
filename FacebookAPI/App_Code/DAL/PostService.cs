@@ -35,7 +35,7 @@ namespace FacebookAPI.App_Code.DAL
                     throw new ApplicationException($"{_tableName} ");
                 }
 
-                post.SetNewValues(dataPost);
+                //post.SetNewValues(dataPost);
 
                 return post;
             }

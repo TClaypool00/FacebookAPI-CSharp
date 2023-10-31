@@ -1,32 +1,14 @@
 ﻿using FacebookAPI.App_Code.CoreModels;
+using FacebookAPI.App_Code.ViewModels.Interfaces;
 using FacebookAPI.App_Code.ViewModels.PostModels;
 
 namespace FacebookAPI.App_Code.ViewModels
 {
-    public class PostViewModel : PostPostViewModel
+    public class PostViewModel : PostPostViewModel, IBaseViewModel
     {
+        #region Private fields
         private CorePost _corePost;
-        private string _userDisplayName;
-
-        public int PostId { get; set; }
-
-        public string DatePosted { get; set; }
-
-        public string UserDisplayName
-        {
-            get { return _userDisplayName; }
-            set
-            {
-                _userDisplayName = value;
-            }
-        }
-
-        public bool IsEdited { get; set; }
-
-        public int LikeCount { get; set; }
-        public bool Liked { get; set; }
-
-        public List<CommentViewModel> Comments { get; set; }
+        #endregion
 
         public PostViewModel()
         {
@@ -47,6 +29,21 @@ namespace FacebookAPI.App_Code.ViewModels
         {
             Construct(corePost);
         }
+
+        #region Public Properties
+        public int PostId { get; set; }
+
+        public List<CommentViewModel> Comments { get; set; }
+
+        #region Implemented methods
+        public string UserDisplayName { get => _userDisplayName; set => _userDisplayName = value; }
+        public string DatePosted { get => _datePosted; set => _datePosted = value; }
+        public bool IsEdited { get => _isEdited; set => _isEdited = value; }
+        public int LikeCount { get => _likeCount; set => _likeCount = value; }
+        public bool Liked { get => _liked; set => _liked = value; }
+        public string Message { get => _message; set => _message = value; }
+        #endregion
+        #endregion
 
         private void Construct(CorePost corePost)
         {

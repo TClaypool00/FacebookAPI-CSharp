@@ -150,6 +150,33 @@ namespace FacebookAPI.Controllers
                 return InternalError(ex);
             }
         }
+
+        [HttpGet]
+        public async Task<ActionResult> GetCommentsAsync(int userId, int? index = null, int? postId = null)
+        {
+            try
+            {
+                var coreComments = await _commentService.GetCommentsAsync(userId, index, postId);
+
+                if (coreComments.Count == 0)
+                {
+                    return NotFound(_commentService.NoCommentsFound);
+                }
+
+                var commentViewModels = new List<CommentViewModel>();
+
+                for (int i = 0; i < coreComments.Count; i++)
+                {
+                    commentViewModels.Add(new CommentViewModel(coreComments[i]));
+                }
+
+                return Ok(commentViewModels);
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
         #endregion
     }
 }

@@ -18,6 +18,8 @@ namespace FacebookAPI.App_Code.DAL
 
         public string CommentNotFoundMessage => $"{_tableName} {_doesNotExistMessage}";
 
+        public string NoCommentsFound => _configuration["NotFoundMessages:Comments"];
+
         public async Task<CoreComment> AddCommentAsync(CoreComment comment)
         {
             var dataComment = new Comment(comment);
@@ -46,6 +48,69 @@ namespace FacebookAPI.App_Code.DAL
             var comment = await FindCommentByIdAsync(id, true);
 
             return new CoreComment(comment);
+        }
+
+        public async Task<List<CoreComment>> GetCommentsAsync(int userId, int? index = null, int? postId = null)
+        {
+            ConfigureIndex(index);
+
+            var coreComments = new List<CoreComment>();
+            List<Comment> comments;
+
+            if (postId is null)
+            {
+                comments = await _context.Comments
+                    .Where(u => u.UserId == userId)
+                    .Take(_takeValue)
+                    .Skip(_index)
+                    .Select(c => new Comment
+                    {
+                        CommentId = c.CommentId,
+                        CommentBody = c.CommentBody,
+                        DatePosted = c.DatePosted,
+                        DateUpdated = c.DateUpdated,
+                        PostId = c.PostId,
+                        User = new User
+                        {
+                            UserId = c.User.UserId,
+                            FirstName = c.User.FirstName,
+                            LastName = c.User.LastName,
+                        }
+                    })
+                    .ToListAsync();
+            }
+            else
+            {
+                comments = await _context.Comments
+                    .Where(u => u.UserId == userId && u.PostId == postId)
+                    .Take(_takeValue)
+                    .Skip(_index)
+                    .Select(c => new Comment
+                    {
+                        CommentId = c.CommentId,
+                        CommentBody = c.CommentBody,
+                        DatePosted = c.DatePosted,
+                        DateUpdated = c.DateUpdated,
+                        PostId = postId,
+                        User = new User
+                        {
+                            UserId = c.User.UserId,
+                            FirstName = c.User.FirstName,
+                            LastName = c.User.LastName,
+                        }
+                    })
+                    .ToListAsync();
+            }
+
+            if (comments.Count > 0)
+            {
+                for (int i = 0; i < comments.Count; i++)
+                {
+                    coreComments.Add(new CoreComment(comments[i]));
+                }
+            }
+
+            return coreComments;
         }
 
         public async Task<CoreComment> UpdateCommentAsync(CoreComment comment)

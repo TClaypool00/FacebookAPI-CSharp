@@ -5,6 +5,8 @@ namespace FacebookAPI.App_Code.BLL
     public interface ICommentService
     {
         #region Public Properties
+        public Task<List<CoreComment>> GetCommentsAsync(int userId, int? index = null, int? postId = null);
+
         public Task<CoreComment> AddCommentAsync(CoreComment comment);
 
         public Task<CoreComment> UpdateCommentAsync(CoreComment comment);
@@ -22,6 +24,8 @@ namespace FacebookAPI.App_Code.BLL
         public string CommentUpdatedOKMessage { get; }
 
         public string CommentNotFoundMessage { get; }
+
+        public string NoCommentsFound { get; }
         #endregion
     }
 }

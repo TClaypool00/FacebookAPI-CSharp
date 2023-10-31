@@ -54,6 +54,7 @@ builder.Services.AddDbContext<FacebookDbContext>(options => options.UseMySql(Sec
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IReplyService, ReplyService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 //JWT Authentication

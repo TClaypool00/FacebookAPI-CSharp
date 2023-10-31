@@ -239,9 +239,14 @@ namespace FacebookAPI.App_Code.DAL
             }
         }
 
-        public async Task<CorePost> GetPostByIdAsync(int id)
+        public async Task<CorePost> GetPostByIdAsync(int id, bool? includeComments = null)
         {
             var dataPost = await FindPostByIdAsync(id);
+
+            if (includeComments == true)
+            {
+                dataPost.Comments = await FindCommentsByPostId(id);
+            }
 
             return new CorePost(dataPost);
         }
@@ -276,6 +281,28 @@ namespace FacebookAPI.App_Code.DAL
                     }
                 }).FirstOrDefaultAsync(a => a.PostId == id);
             }
+        }
+
+        private Task<List<Comment>> FindCommentsByPostId(int id)
+        {
+            return _context.Comments
+                .Select(c => new Comment
+                {
+                    CommentId = c.CommentId,
+                    CommentBody = c.CommentBody,
+                    DatePosted = c.DatePosted,
+                    DateUpdated = c.DateUpdated,
+                    PostId = id,
+                    User = new User
+                    {
+                        UserId = c.User.UserId,
+                        FirstName = c.User.FirstName,
+                        LastName = c.User.LastName
+                    }
+                })
+                .Take(_takeValue)
+                .Skip(_index)
+                .ToListAsync();
         }
     }
 }

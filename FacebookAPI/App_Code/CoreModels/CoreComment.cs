@@ -34,7 +34,10 @@ namespace FacebookAPI.App_Code.CoreModels
             CommentBody = _comment.CommentBody;
             DatePosted = _comment.DatePosted;
             DateUpdated = _comment.DateUpdated;
-            PostId = (int)_comment.PostId;
+            if (_comment.PostId is not null)
+            {
+                PostId = (int)_comment.PostId;
+            }
 
             if (_comment.User is not null)
             {

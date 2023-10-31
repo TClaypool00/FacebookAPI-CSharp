@@ -121,7 +121,7 @@ namespace FacebookAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetPostAsync(int id)
+        public async Task<ActionResult> GetPostAsync(int id, [FromQuery] bool? includeComments = null)
         {
             try
             {
@@ -130,7 +130,12 @@ namespace FacebookAPI.Controllers
                     return Unauthorized(UnAuthorizedMessage);
                 }
 
-                var corePost = await _postService.GetPostByIdAsync(id);
+                if (IsAdmin && !await _postService.PostExistsAsync(id))
+                {
+                    return NotFound(_postService.PostDoesNotExistMessage);
+                }
+
+                var corePost = await _postService.GetPostByIdAsync(id, includeComments);
 
                 return Ok(new PostViewModel(corePost));
             }

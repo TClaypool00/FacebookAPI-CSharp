@@ -199,6 +199,15 @@ namespace FacebookAPI.App_Code.DAL
         {
             var dataPost = await FindPostByIdAsync(id, false);
 
+            dataPost.Comments = await FindCommentsByPostId(id, false);
+
+            if (dataPost.Comments.Count > 0)
+            {
+                _context.Comments.RemoveRange(dataPost.Comments);
+
+                await SaveAsync();
+            }
+
             _context.Posts.Remove(dataPost);
 
             await SaveAsync();
@@ -290,9 +299,11 @@ namespace FacebookAPI.App_Code.DAL
             }
         }
 
-        private Task<List<Comment>> FindCommentsByPostId(int id)
+        private Task<List<Comment>> FindCommentsByPostId(int id, bool includeUser = true)
         {
-            return _context.Comments
+            if (includeUser)
+            {
+                return _context.Comments
                 .Select(c => new Comment
                 {
                     CommentId = c.CommentId,
@@ -310,6 +321,13 @@ namespace FacebookAPI.App_Code.DAL
                 .Take(_takeValue)
                 .Skip(_index)
                 .ToListAsync();
+            }
+            else
+            {
+                return _context.Comments
+                    .Where(c => c.PostId == id)
+                    .ToListAsync();
+            }
         }
         #endregion
     }

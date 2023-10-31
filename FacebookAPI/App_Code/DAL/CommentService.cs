@@ -20,6 +20,8 @@ namespace FacebookAPI.App_Code.DAL
 
         public string NoCommentsFound => _configuration["NotFoundMessages:Comments"];
 
+        public string CommentDeletedOKMessage => $"{_tableName} {_deletedMessage}";
+
         public async Task<CoreComment> AddCommentAsync(CoreComment comment)
         {
             var dataComment = new Comment(comment);
@@ -41,6 +43,14 @@ namespace FacebookAPI.App_Code.DAL
         public Task<bool> CommentExistsAsync(int id)
         {
             return _context.Comments.AnyAsync(c => c.CommentId == id);
+        }
+
+        public async Task DeleteCommentAsync(int id)
+        {
+            var comment = await FindCommentByIdAsync(id);
+
+            _context.Comments.Remove(comment);
+            await SaveAsync();
         }
 
         public async Task<CoreComment> GetCommentAsync(int id)

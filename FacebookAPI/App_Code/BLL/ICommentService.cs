@@ -16,6 +16,8 @@ namespace FacebookAPI.App_Code.BLL
         public Task<bool> CommentExistsAsync(int id);
 
         public Task<bool> UserHasAccessToCommentAsync(int id, int userId);
+
+        public Task DeleteCommentAsync(int id);
         #endregion
 
         #region Public Properties
@@ -26,6 +28,8 @@ namespace FacebookAPI.App_Code.BLL
         public string CommentNotFoundMessage { get; }
 
         public string NoCommentsFound { get; }
+
+        public string CommentDeletedOKMessage { get; }
         #endregion
     }
 }

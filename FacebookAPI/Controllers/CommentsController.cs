@@ -177,6 +177,31 @@ namespace FacebookAPI.Controllers
                 return InternalError(ex);
             }
         }
+
+        [HttpDelete]
+        public async Task<ActionResult> DeleteCommentAsync(int id)
+        {
+            try
+            {
+                if (!IsAdmin && !await _commentService.UserHasAccessToCommentAsync(id, UserId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                if (IsAdmin && !await _commentService.CommentExistsAsync(id))
+                {
+                    return NotFound(_commentService.NoCommentsFound);
+                }
+
+                await _commentService.DeleteCommentAsync(id);
+
+                return Ok(_commentService.CommentDeletedOKMessage);
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
         #endregion
     }
 }

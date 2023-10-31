@@ -37,10 +37,10 @@ namespace FacebookAPI.App_Code.DAL
 
                 if (dataPost.PostId == 0)
                 {
-                    throw new ApplicationException($"{_tableName} ");
+                    throw new ApplicationException($"{_couldNotAddedMessage} {_tableName} ");
                 }
 
-                //post.SetNewValues(dataPost);
+                post.PostId = dataPost.PostId;
 
                 return post;
             }

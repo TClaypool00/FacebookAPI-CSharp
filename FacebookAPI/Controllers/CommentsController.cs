@@ -125,6 +125,31 @@ namespace FacebookAPI.Controllers
                 return InternalError(ex);
             }
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetCommentByIdAync(int id)
+        {
+            try
+            {
+                if (!IsAdmin && !await _commentService.UserHasAccessToCommentAsync(id, UserId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                if (IsAdmin && !await _commentService.CommentExistsAsync(id))
+                {
+                    return NotFound(_commentService.CommentNotFoundMessage);
+                }
+
+                var coreComment = await _commentService.GetCommentAsync(id);
+
+                return Ok(new CommentViewModel(coreComment));
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
         #endregion
     }
 }

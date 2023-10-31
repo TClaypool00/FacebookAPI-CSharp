@@ -41,6 +41,13 @@ namespace FacebookAPI.App_Code.DAL
             return _context.Comments.AnyAsync(c => c.CommentId == id);
         }
 
+        public async Task<CoreComment> GetCommentAsync(int id)
+        {
+            var comment = await FindCommentByIdAsync(id, true);
+
+            return new CoreComment(comment);
+        }
+
         public async Task<CoreComment> UpdateCommentAsync(CoreComment comment)
         {
             var dataComment = await FindCommentByIdAsync(comment.CommentId);
@@ -62,9 +69,30 @@ namespace FacebookAPI.App_Code.DAL
             return _context.Comments.AnyAsync(c => c.CommentId == id  && c.UserId == userId);
         }
 
-        private Task<Comment> FindCommentByIdAsync(int id)
+        private Task<Comment> FindCommentByIdAsync(int id, bool includeUser = false)
         {
-            return _context.Comments.FirstOrDefaultAsync(c => c.CommentId == id);
+            if (includeUser)
+            {
+                return _context.Comments
+                    .Select(c => new Comment
+                    {
+                        CommentId = c.CommentId,
+                        CommentBody = c.CommentBody,
+                        DatePosted = c.DatePosted,
+                        DateUpdated = c.DateUpdated,
+                        PostId = c.PostId,
+                        User = new User
+                        {
+                            UserId = c.User.UserId,
+                            FirstName = c.User.FirstName,
+                            LastName = c.User.LastName
+                        }
+                    }).FirstOrDefaultAsync(a => a.CommentId == id);
+            }
+            else
+            {
+                return _context.Comments.FirstOrDefaultAsync(c => c.CommentId == id);
+            }
         }
     }
 }

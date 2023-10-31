@@ -9,6 +9,8 @@ namespace FacebookAPI.App_Code.BLL
 
         public Task<CoreComment> UpdateCommentAsync(CoreComment comment);
 
+        public Task<CoreComment> GetCommentAsync(int id);
+
         public Task<bool> CommentExistsAsync(int id);
 
         public Task<bool> UserHasAccessToCommentAsync(int id, int userId);

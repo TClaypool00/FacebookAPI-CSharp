@@ -66,7 +66,59 @@ namespace FacebookAPI.Controllers
                     coreComment.User = await _userService.GetFullNameAsync(model.UserId);
                 }
 
-                return Ok(new CommentViewModel(coreComment));
+                return Ok(new CommentViewModel(coreComment, _commentService.CommentAddedOKMessag));
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateCommentAsync(int id, [FromBody] PostCommentViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return DisplayErrors();
+                }
+
+                if (!await _commentService.CommentExistsAsync(id))
+                {
+                    return NotFound(_commentService.CommentNotFoundMessage);
+                }
+
+                if (!IsAdmin && !IsUserIdSame(model.UserId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                if (IsAdmin && !IsUserIdSame(model.UserId) && !await _userService.UserExistsAsync(model.UserId))
+                {
+                    return NotFound(_userService.UserDoesNotExistsMessage);
+                }
+
+                if (!await _postService.PostExistsAsync(model.PostId))
+                {
+                    return NotFound(_postService.PostDoesNotExistMessage);
+                }
+
+                var coreComment = new CoreComment(model, id);
+
+                coreComment = await _commentService.UpdateCommentAsync(coreComment);
+
+                if (IsUserIdSame(model.UserId))
+                {
+                    coreComment.User = new CoreUser(UserId, FirstName, LastName);
+                }
+                else
+                {
+                    coreComment.User = await _userService.GetFullNameAsync(model.UserId);
+                }
+
+                return Ok(new CommentViewModel(coreComment, _commentService.CommentUpdatedOKMessage));
+
             }
             catch (Exception ex)
             {

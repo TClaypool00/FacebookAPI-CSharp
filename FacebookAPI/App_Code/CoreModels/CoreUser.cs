@@ -65,9 +65,7 @@ namespace FacebookAPI.App_Code.CoreModels
         public List<CoreComment> Comments { get; set; }
         public List<CoreIssueTask> IssueTasks { get; set; }
         public List<CorePicture> Pictures { get; set; }
-
-
-        //TODO: Create CoreReply        
+        public List<CoreReply> Replies { get; set; }      
 
         public CoreUser()
         {

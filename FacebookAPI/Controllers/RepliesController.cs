@@ -72,6 +72,51 @@ namespace FacebookAPI.Controllers
                 return InternalError(ex);
             }
         }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateReplyAsync(int id, [FromBody] PostReplyViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return DisplayErrors();
+                }
+
+                if (!await _userService.UserExistsAsync(model.UserId))
+                {
+                    return NotFound(_userService.UserDoesNotExistsMessage);
+                }
+
+                if (!IsAdmin && !IsUserIdSame(model.UserId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                if (!await _commentService.CommentExistsAsync(model.CommentId))
+                {
+                    return NotFound(_commentService.CommentNotFoundMessage);
+                }
+
+                var coreReply = new CoreReply(model, id);
+                coreReply = await _replyService.UpdateReplyAsync(coreReply);
+
+                if (IsUserIdSame(model.UserId))
+                {
+                    coreReply.User = new CoreUser(UserId, FirstName, LastName);
+                }
+                else
+                {
+                    coreReply.User = await _userService.GetFullNameAsync(model.UserId);
+                }
+
+                return Ok(new ReplyViewModel(coreReply, _replyService.ReplyUpdatedOKMessage));
+            }
+            catch (Exception e)
+            {
+                return InternalError(e);
+            }
+        }
         #endregion
     }
 }

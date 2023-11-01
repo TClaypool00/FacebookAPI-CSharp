@@ -19,6 +19,12 @@ namespace FacebookAPI.App_Code.CoreModels
         {
             Construct(postReplyViewModel);
         }
+
+        public CoreReply(PostReplyViewModel postReplyViewModel, int id)
+        {
+            Construct(postReplyViewModel);
+            ReplyId = id;
+        }
         #endregion
 
         #region Public Properties

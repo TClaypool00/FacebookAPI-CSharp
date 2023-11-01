@@ -1,6 +1,7 @@
 ﻿using FacebookAPI.App_Code.BLL;
 using FacebookAPI.App_Code.BOL;
 using FacebookAPI.App_Code.CoreModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace FacebookAPI.App_Code.DAL
 {
@@ -15,6 +16,10 @@ namespace FacebookAPI.App_Code.DAL
 
         #region Publci Properties
         public string ReplyAddedOKMessage => $"{_tableName} {_addedOKMessage}";
+
+        public string ReplyUpdatedOKMessage => $"{_tableName} {_updatedOKMessage}";
+
+        public string ReplyNotFoundMessage => $"{_tableName} {_doesNotExistMessage}";
         #endregion
 
         #region Public Methods
@@ -35,6 +40,46 @@ namespace FacebookAPI.App_Code.DAL
             reply.DateUpdated = dataReply.DateUpdated;
 
             return reply;
+        }
+
+        public Task<bool> ReplyExistsAsync(int id)
+        {
+            return _context.Replies.AnyAsync(r => r.ReplyId == id);
+        }
+
+        public async Task<CoreReply> UpdateReplyAsync(CoreReply reply)
+        {
+            try
+            {
+                var dataReply = await FindReplyByIdAsync(reply.ReplyId);
+                dataReply.ReplyBody = reply.ReplyBody;
+                dataReply.UserId = reply.UserId;
+
+                _context.Replies.Update(dataReply);
+                await SaveAsync();
+
+                reply.DateUpdated = dataReply.DateUpdated;
+
+                DetachEntity(dataReply);
+
+                return reply;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public Task<bool> UserHasAccessToReplyAsync(int id, int userId)
+        {
+            return _context.Replies.AnyAsync(r => r.ReplyId == id && r.UserId == userId);
+        }
+        #endregion
+
+        #region Private methods
+        private Task<Reply> FindReplyByIdAsync(int id)
+        {
+            return _context.Replies.FirstOrDefaultAsync(r => r.ReplyId == id);
         }
         #endregion
     }

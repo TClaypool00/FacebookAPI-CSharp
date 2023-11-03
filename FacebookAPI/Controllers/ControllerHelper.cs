@@ -7,6 +7,7 @@ namespace FacebookAPI.Controllers
         #region Private fields
         private readonly string _internalMessage;
         private readonly string _unauthorizedMessage;
+        private readonly string _allParametersNullMessages;
         #endregion
 
         #region Protected fields
@@ -19,6 +20,7 @@ namespace FacebookAPI.Controllers
             _configuration = configuration;
             _internalMessage = _configuration.GetSection("Messages").GetSection("Internal").Value;
             _unauthorizedMessage = _configuration["Messages:Unauthorized"];
+            _allParametersNullMessages = _configuration["Messages:AllParametersNull"];
         }
         #endregion
 
@@ -73,6 +75,14 @@ namespace FacebookAPI.Controllers
                 return _unauthorizedMessage;
             }
         }
+
+        protected string AllParametersNullMessage
+        {
+            get
+            {
+                return _allParametersNullMessages;
+            }
+        }
         #endregion
         #endregion
 
@@ -100,6 +110,38 @@ namespace FacebookAPI.Controllers
         protected bool IsUserIdSame(int userId)
         {
             return userId == UserId;
+        }
+
+        protected bool IsUserIdSame(int? userId)
+        {
+            if (userId is null)
+            {
+                return false;
+            }
+
+            return userId.Value == UserId;
+        }
+
+        protected bool AllParametersNull(params int?[] parameters)
+        {
+            bool isNull = false;
+
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                if (parameters[i] is not null)
+                {
+                    isNull = false;
+                    break;
+                }
+
+                if (i == parameters.Length - 1)
+                {
+                    isNull = true;
+                    break;
+                }
+            }
+
+            return isNull;
         }
         #endregion
 

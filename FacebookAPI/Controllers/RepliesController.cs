@@ -142,6 +142,44 @@ namespace FacebookAPI.Controllers
                 return InternalError(e);
             }
         }
+
+        [HttpGet]
+        public async Task<ActionResult> GetRepliesAsync([FromQuery] int? index = null, int? userId = null, int? commentId = null, int? postId = null)
+        {
+            try
+            {
+                if (AllParametersNull(userId, commentId, postId))
+                {
+                    return BadRequest(AllParametersNullMessage);
+                }
+
+                if (userId is null && !IsUserIdSame(userId) && !IsAdmin)
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                var coreReplies = await _replyService.GetRepliesAsync(index, userId, commentId, postId);
+
+                if (coreReplies.Count == 0)
+                {
+                    return NotFound(_replyService.NoRepliesFoundMessage);
+                }
+
+                var replyViewModels = new List<ReplyViewModel>();
+
+                for (var i = 0; i < coreReplies.Count; i++)
+                {
+                    replyViewModels.Add(new ReplyViewModel(coreReplies[i]));
+                }
+
+                return Ok(replyViewModels);
+
+            }
+            catch (Exception e)
+            {
+                return InternalError(e);
+            }
+        }
         #endregion
     }
 }

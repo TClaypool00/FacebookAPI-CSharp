@@ -11,6 +11,8 @@ namespace FacebookAPI.App_Code.BLL
 
         public Task<CoreReply> GetReplyAsync(int id);
 
+        public Task<List<CoreReply>> GetRepliesAsync(int? index = null, int? userId = null, int? commentId = null, int? postId = null);
+
         public Task<bool> UserHasAccessToReplyAsync(int id, int userId);
 
         public Task<bool> ReplyExistsAsync(int id);
@@ -22,6 +24,8 @@ namespace FacebookAPI.App_Code.BLL
         public string ReplyUpdatedOKMessage { get; }
 
         public string ReplyNotFoundMessage { get; }
+
+        public string NoRepliesFoundMessage { get; }
         #endregion
     }
 }

@@ -20,6 +20,8 @@ namespace FacebookAPI.App_Code.DAL
         public string ReplyUpdatedOKMessage => $"{_tableName} {_updatedOKMessage}";
 
         public string ReplyNotFoundMessage => $"{_tableName} {_doesNotExistMessage}";
+
+        public string NoRepliesFoundMessage => _configuration["NotFoundMessages:Replies"];
         #endregion
 
         #region Public Methods
@@ -40,6 +42,111 @@ namespace FacebookAPI.App_Code.DAL
             reply.DateUpdated = dataReply.DateUpdated;
 
             return reply;
+        }
+
+        public async Task<List<CoreReply>> GetRepliesAsync(int? index = null, int? userId = null, int? commentId = null, int? postId = null)
+        {
+            ConfigureIndex(index);
+            List<Reply> replies = null;
+            var coreReplies = new List<CoreReply>();
+
+            if (userId is not null)
+            {
+                replies = await _context.Replies
+                    .Where(a => a.UserId == userId)
+                    .Select(r => new Reply
+                    {
+                        ReplyId = r.ReplyId,
+                        ReplyBody = r.ReplyBody,
+                        DatePosted = r.DatePosted,
+                        DateUpdated = r.DateUpdated,
+                        CommentId = r.CommentId,
+                        User = new User
+                        {
+                            UserId = r.User.UserId,
+                            FirstName = r.User.FirstName,
+                            LastName = r.User.LastName
+                        }
+                    })
+                    .Take(_takeValue)
+                    .Skip(_index)
+                    .ToListAsync();
+            }
+
+            if (commentId is not null)
+            {
+                if (replies is null)
+                {
+                    replies = await _context.Replies
+                    .Where(a => a.CommentId == commentId)
+                    .Select(r => new Reply
+                    {
+                        ReplyId = r.ReplyId,
+                        ReplyBody = r.ReplyBody,
+                        DatePosted = r.DatePosted,
+                        DateUpdated = r.DateUpdated,
+                        CommentId = r.CommentId,
+                        User = new User
+                        {
+                            UserId = r.User.UserId,
+                            FirstName = r.User.FirstName,
+                            LastName = r.User.LastName
+                        }
+                    })
+                    .Take(_takeValue)
+                    .Skip(_index)
+                    .ToListAsync();
+                }
+                else
+                {
+                    replies = replies.Where(u => u.CommentId == commentId).ToList();
+                }
+            }
+
+            if (postId is not null)
+            {
+                var commentIds = await _context.Comments
+                    .Where(a => a.PostId == postId)
+                    .Select(c => c.CommentId)
+                    .ToListAsync();
+
+                if (replies is null)
+                {
+                    replies = await _context.Replies
+                    .Where(a => commentIds.Contains(a.CommentId))
+                    .Select(r => new Reply
+                    {
+                        ReplyId = r.ReplyId,
+                        ReplyBody = r.ReplyBody,
+                        DatePosted = r.DatePosted,
+                        DateUpdated = r.DateUpdated,
+                        CommentId = r.CommentId,
+                        User = new User
+                        {
+                            UserId = r.User.UserId,
+                            FirstName = r.User.FirstName,
+                            LastName = r.User.LastName
+                        }
+                    })
+                    .Take(_takeValue)
+                    .Skip(_index)
+                    .ToListAsync();
+                }
+                else
+                {
+                    replies = replies.Where(r => commentIds.Contains(r.CommentId)).ToList();
+                }
+            }
+
+            if (replies is not null && replies.Count > 0)
+            {
+                for (int i = 0; i < replies.Count; i++)
+                {
+                    coreReplies.Add(new CoreReply(replies[i]));
+                }
+            }
+
+            return coreReplies;
         }
 
         public async Task<CoreReply> GetReplyAsync(int id)

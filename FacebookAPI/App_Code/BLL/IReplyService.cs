@@ -16,6 +16,8 @@ namespace FacebookAPI.App_Code.BLL
         public Task<bool> UserHasAccessToReplyAsync(int id, int userId);
 
         public Task<bool> ReplyExistsAsync(int id);
+
+        public Task DeleteReplyByIdAsync(int id);
         #endregion
 
         #region Public Properties
@@ -26,6 +28,8 @@ namespace FacebookAPI.App_Code.BLL
         public string ReplyNotFoundMessage { get; }
 
         public string NoRepliesFoundMessage { get; }
+
+        public string ReplyDeletedOKMessage { get; }
         #endregion
     }
 }

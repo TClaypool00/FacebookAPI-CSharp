@@ -22,6 +22,8 @@ namespace FacebookAPI.App_Code.DAL
         public string ReplyNotFoundMessage => $"{_tableName} {_doesNotExistMessage}";
 
         public string NoRepliesFoundMessage => _configuration["NotFoundMessages:Replies"];
+
+        public string ReplyDeletedOKMessage => $"{_tableName} {_deletedMessage}";
         #endregion
 
         #region Public Methods
@@ -42,6 +44,14 @@ namespace FacebookAPI.App_Code.DAL
             reply.DateUpdated = dataReply.DateUpdated;
 
             return reply;
+        }
+
+        public async Task DeleteReplyByIdAsync(int id)
+        {
+            var dataReply = await FindReplyByIdAsync(id);
+
+            _context.Replies.Remove(dataReply);
+            await SaveAsync();
         }
 
         public async Task<List<CoreReply>> GetRepliesAsync(int? index = null, int? userId = null, int? commentId = null, int? postId = null)

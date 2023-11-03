@@ -180,6 +180,31 @@ namespace FacebookAPI.Controllers
                 return InternalError(e);
             }
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteReplyAsync(int id)
+        {
+            try
+            {
+                if (IsAdmin && !await _replyService.ReplyExistsAsync(id))
+                {
+                    return NotFound(_replyService.NoRepliesFoundMessage);
+                }
+
+                if (!IsAdmin && !await _replyService.UserHasAccessToReplyAsync(id, UserId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                await _replyService.DeleteReplyByIdAsync(id);
+
+                return Ok(_replyService.ReplyDeletedOKMessage);
+            }
+            catch (Exception e)
+            {
+                return InternalError(e);
+            }
+        }
         #endregion
     }
 }

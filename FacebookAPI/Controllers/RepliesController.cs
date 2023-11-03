@@ -117,6 +117,31 @@ namespace FacebookAPI.Controllers
                 return InternalError(e);
             }
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetReplyByIdAsync(int id)
+        {
+            try
+            {
+                if (IsAdmin && !await _replyService.ReplyExistsAsync(id))
+                {
+                    return NotFound(_replyService.ReplyNotFoundMessage);
+                }
+
+                if (!IsAdmin && !await _replyService.UserHasAccessToReplyAsync(id, UserId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                var reply = await _replyService.GetReplyAsync(id);
+
+                return Ok(new ReplyViewModel(reply));
+            }
+            catch (Exception e)
+            {
+                return InternalError(e);
+            }
+        }
         #endregion
     }
 }

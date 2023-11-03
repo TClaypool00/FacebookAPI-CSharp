@@ -1,4 +1,5 @@
-﻿using FacebookAPI.App_Code.CoreModels.BaseCoreModels;
+﻿using FacebookAPI.App_Code.BOL;
+using FacebookAPI.App_Code.CoreModels.BaseCoreModels;
 using FacebookAPI.App_Code.ViewModels.PostModels;
 
 namespace FacebookAPI.App_Code.CoreModels
@@ -7,6 +8,7 @@ namespace FacebookAPI.App_Code.CoreModels
     {
         #region Private fields
         private PostReplyViewModel _postReplyViewModel;
+        private Reply _reply;
         #endregion
 
         #region Constructors
@@ -24,6 +26,27 @@ namespace FacebookAPI.App_Code.CoreModels
         {
             Construct(postReplyViewModel);
             ReplyId = id;
+        }
+
+        public CoreReply(Reply reply)
+        {
+            _reply = reply ?? throw new ArgumentNullException(nameof(reply));
+
+            ReplyId = _reply.ReplyId;
+            ReplyBody = _reply.ReplyBody;
+            DatePosted = _reply.DatePosted;
+            DateUpdated = _reply.DateUpdated;
+            CommentId = _reply.CommentId;
+
+            if (_reply.Comment is not null)
+            {
+                Comment = new CoreComment(_reply.Comment);
+            }
+
+            if (_reply.User is not null)
+            {
+                User = new CoreUser(_reply.User);
+            }
         }
         #endregion
 

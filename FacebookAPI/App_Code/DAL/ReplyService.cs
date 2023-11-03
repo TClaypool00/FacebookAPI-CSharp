@@ -42,6 +42,27 @@ namespace FacebookAPI.App_Code.DAL
             return reply;
         }
 
+        public async Task<CoreReply> GetReplyAsync(int id)
+        {
+            var reply = await _context.Replies
+                .Select(r => new Reply
+                {
+                    ReplyId = id,
+                    ReplyBody  = r.ReplyBody,
+                    DatePosted = r.DatePosted,
+                    DateUpdated = r.DateUpdated,
+                    CommentId = r.CommentId,
+                    User = new User
+                    {
+                        UserId = r.User.UserId,
+                        FirstName = r.User.FirstName,
+                        LastName = r.User.LastName,
+                    }
+                }).FirstOrDefaultAsync(a => a.ReplyId == id);
+
+            return new CoreReply(reply);
+        }
+
         public Task<bool> ReplyExistsAsync(int id)
         {
             return _context.Replies.AnyAsync(r => r.ReplyId == id);

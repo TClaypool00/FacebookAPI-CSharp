@@ -9,6 +9,8 @@ namespace FacebookAPI.App_Code.BLL
 
         public Task<CoreReply> UpdateReplyAsync(CoreReply reply);
 
+        public Task<CoreReply> GetReplyAsync(int id);
+
         public Task<bool> UserHasAccessToReplyAsync(int id, int userId);
 
         public Task<bool> ReplyExistsAsync(int id);

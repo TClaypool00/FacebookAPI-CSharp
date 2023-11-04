@@ -1,6 +1,7 @@
 ﻿using FacebookAPI.App_Code.BLL;
 using FacebookAPI.App_Code.BOL;
 using FacebookAPI.App_Code.ViewModels;
+using FacebookAPI.App_Code.ViewModels.PostModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,20 +17,23 @@ namespace FacebookAPI.Controllers
         private readonly IPostService _postService;
         private readonly ICommentService _commentService;
         private readonly IReplyService _replyService;
+        private readonly IUserService _userService;
         #endregion
 
         #region Constructors
-        public LikesController(IConfiguration configuration, IPostService postService, ICommentService commentService, IReplyService replyService, ILikeService likeService) : base(configuration)
+        public LikesController(IConfiguration configuration, IPostService postService, ICommentService commentService, IReplyService replyService, ILikeService likeService, IUserService userService) : base(configuration)
         {
             _postService = postService;
             _commentService = commentService;
             _replyService = replyService;
             _likeService = likeService;
+            _userService = userService;
         }
+        #endregion
 
         #region Public Methods
         [HttpPost("AddCommentLike")]
-        public async Task<ActionResult> PostLikeCommentAsync([FromBody] IdViewModel model)
+        public async Task<ActionResult> PostLikeCommentAsync([FromBody] PostLikeViewModel model)
         {
             try
             {
@@ -38,17 +42,27 @@ namespace FacebookAPI.Controllers
                     return DisplayErrors();
                 }
 
+                if (!await _userService.UserExistsAsync(model.UserId))
+                {
+                    return NotFound(_userService.UserDoesNotExistsMessage);
+                }
+
+                if (!IsAdmin && !IsUserIdSame(model.UserId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
                 if (!await _commentService.CommentExistsAsync(model.Id))
                 {
                     return NotFound(_commentService.CommentNotFoundMessage);
                 }
 
-                if (await _likeService.LikeExistsAsync(model.Id, UserId, Like.LikeOptions.Comment))
+                if (await _likeService.LikeExistsAsync(model.Id, model.UserId, Like.LikeOptions.Comment))
                 {
                     return BadRequest(_likeService.LikeExistMessage);
                 }
 
-                var like = await _likeService.AddLikeAsync(model.Id, UserId, Like.LikeOptions.Comment);
+                var like = await _likeService.AddLikeAsync(model.Id, model.UserId, Like.LikeOptions.Comment);
 
                 return Ok(new LikeViewModel(like));
             }
@@ -57,7 +71,6 @@ namespace FacebookAPI.Controllers
                 return InternalError(e);
             }
         }
-        #endregion
         #endregion
     }
 }

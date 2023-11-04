@@ -111,6 +111,46 @@ namespace FacebookAPI.Controllers
                 return InternalError(e);
             }
         }
+
+        [HttpPost("AddReplyLike")]
+        public async Task<ActionResult> PostLikeReplyAsync([FromBody] PostLikeViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return DisplayErrors();
+                }
+
+                if (!await _userService.UserExistsAsync(model.UserId))
+                {
+                    return NotFound(_userService.UserDoesNotExistsMessage);
+                }
+
+                if (!IsAdmin && !IsUserIdSame(model.UserId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                if (!await _replyService.ReplyExistsAsync(model.Id))
+                {
+                    return NotFound(_replyService.ReplyNotFoundMessage);
+                }
+
+                if (await _likeService.LikeExistsAsync(model.Id, model.UserId, Like.LikeOptions.Reply))
+                {
+                    return BadRequest(_likeService.LikeExistMessage);
+                }
+
+                var like = await _likeService.AddLikeAsync(model.Id, model.UserId, Like.LikeOptions.Reply);
+
+                return Ok(new LikeViewModel(like));
+            }
+            catch (Exception e)
+            {
+                return InternalError(e);
+            }
+        }
         #endregion
     }
 }

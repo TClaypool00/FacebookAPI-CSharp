@@ -151,6 +151,86 @@ namespace FacebookAPI.Controllers
                 return InternalError(e);
             }
         }
-        #endregion
+
+        [HttpDelete("DeletePostLike")]
+        public async Task<ActionResult> DeleteLikePostAsync([FromBody] PostLikeViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return DisplayErrors();
+                }
+
+                if (!await _userService.UserExistsAsync(model.UserId))
+                {
+                    return NotFound(_userService.UserDoesNotExistsMessage);
+                }
+
+                if (!IsAdmin && !IsUserIdSame(model.UserId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                if (!await _postService.PostExistsAsync(model.Id))
+                {
+                    return NotFound(_postService.PostDoesNotExistMessage);
+                }
+
+                if (!await _likeService.LikeExistsAsync(model.Id, model.UserId, Like.LikeOptions.Post))
+                {
+                    return BadRequest(_likeService.LikeDoesNotExistMessage);
+                }
+
+                var like = await _likeService.DeleteLikeAsync(model.Id, model.UserId, Like.LikeOptions.Post);
+
+                return Ok(new LikeViewModel(like));
+            }
+            catch (Exception e)
+            {
+                return InternalError(e);
+            }
+        }
+
+        [HttpDelete("DeleteCommentLike")]
+        public async Task<ActionResult> DeleteLikeCommentAsync([FromBody] PostLikeViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return DisplayErrors();
+                }
+
+                if (!await _userService.UserExistsAsync(model.UserId))
+                {
+                    return NotFound(_userService.UserDoesNotExistsMessage);
+                }
+
+                if (!IsAdmin && !IsUserIdSame(model.UserId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                if (!await _commentService.CommentExistsAsync(model.Id))
+                {
+                    return NotFound(_commentService.CommentNotFoundMessage);
+                }
+
+                if (!await _likeService.LikeExistsAsync(model.Id, model.UserId, Like.LikeOptions.Comment))
+                {
+                    return BadRequest(_likeService.LikeDoesNotExistMessage);
+                }
+
+                var like = await _likeService.DeleteLikeAsync(model.Id, model.UserId, Like.LikeOptions.Comment);
+
+                return Ok(new LikeViewModel(like));
+            }
+            catch (Exception e)
+            {
+                return InternalError(e);
+            }
+            #endregion
+        }
     }
 }

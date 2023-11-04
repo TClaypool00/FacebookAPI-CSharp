@@ -230,7 +230,47 @@ namespace FacebookAPI.Controllers
             {
                 return InternalError(e);
             }
-            #endregion
         }
+
+        [HttpDelete("DeleteReplyLike")]
+        public async Task<ActionResult> DeleteLikeReplyAsync([FromBody] PostLikeViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return DisplayErrors();
+                }
+
+                if (!await _userService.UserExistsAsync(model.UserId))
+                {
+                    return NotFound(_userService.UserDoesNotExistsMessage);
+                }
+
+                if (!IsAdmin && !IsUserIdSame(model.UserId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                if (!await _replyService.ReplyExistsAsync(model.Id))
+                {
+                    return NotFound(_replyService.ReplyNotFoundMessage);
+                }
+
+                if (!await _likeService.LikeExistsAsync(model.Id, model.UserId, Like.LikeOptions.Reply))
+                {
+                    return BadRequest(_likeService.LikeDoesNotExistMessage);
+                }
+
+                var like = await _likeService.DeleteLikeAsync(model.Id, model.UserId, Like.LikeOptions.Reply);
+
+                return Ok(new LikeViewModel(like));
+            }
+            catch (Exception e)
+            {
+                return InternalError(e);
+            }
+        }
+        #endregion
     }
 }

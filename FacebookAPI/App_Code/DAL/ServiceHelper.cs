@@ -19,6 +19,8 @@ namespace FacebookAPI.App_Code.DAL
         protected readonly string _deletedMessage;
         protected readonly string _addedOKMessage;
         protected readonly string _updatedOKMessage;
+        protected readonly string _alreadyExists;
+        protected readonly string _invalidOption;
 
         public ServiceHelper(IConfiguration configuration, FacebookDbContext context)
         {
@@ -33,6 +35,8 @@ namespace FacebookAPI.App_Code.DAL
             _deletedMessage = _configuration["messages:Deleted"];
             _addedOKMessage = _configuration["messages:AddedOK"];
             _updatedOKMessage = _configuration["messages:Updated"];
+            _alreadyExists = _configuration["messages:AlreadyExists"];
+            _invalidOption = _configuration["messages:InvalidOption"];
         }
 
         protected void ConfigureIndex(int? index)

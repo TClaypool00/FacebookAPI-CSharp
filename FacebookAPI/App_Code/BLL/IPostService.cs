@@ -9,7 +9,7 @@ namespace FacebookAPI.App_Code.BLL
 
         public Task<CorePost> UpdatePostAsync(CorePost post);
 
-        public Task<CorePost> GetPostByIdAsync(int id, bool? includeComments = null);
+        public Task<CorePost> GetPostByIdAsync(int id, int userId, bool? includeComments = null);
 
         public Task<List<CorePost>> GetAllPostsAsync(int userId, int? index = null, bool? includeComments = null);
 

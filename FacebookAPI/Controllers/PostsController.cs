@@ -135,7 +135,7 @@ namespace FacebookAPI.Controllers
                     return NotFound(_postService.PostDoesNotExistMessage);
                 }
 
-                var corePost = await _postService.GetPostByIdAsync(id, includeComments);
+                var corePost = await _postService.GetPostByIdAsync(id, UserId, includeComments);
 
                 return Ok(new PostViewModel(corePost));
             }

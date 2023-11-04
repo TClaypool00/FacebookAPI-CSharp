@@ -72,17 +72,16 @@ namespace FacebookAPI.App_Code.DAL
                             FirstName = p.User.FirstName,
                             LastName = p.User.LastName
                         },
-                        LikeCount = p.Likes.Where(a => a.UserId == userId && a.PostId == p.PostId).Count(),
+                        LikeCount = p.Likes.Count(a => a.PostId == p.PostId),
                         Liked = p.Likes.Any(a => a.UserId == userId && a.PostId == p.PostId)
                     })
                     .Take(_takeValue)
                     .Skip(_index)
                     .ToListAsync();
 
-            var postIds = PostIdsList(posts);
-
             if (includeComments == true)
             {
+                var postIds = PostIdsList(posts);
                 comments = await FindComments(postIds);
             }
 
@@ -124,8 +123,8 @@ namespace FacebookAPI.App_Code.DAL
                     DatePosted = c.DatePosted,
                     PostId = c.PostId,
                     PostBody = c.PostBody,
-                    LikeCount = c.Likes.Select(l => l.LikeId).Count(),
-                    Liked = c.Likes.Any(c => c.UserId == userId),
+                    LikeCount = c.Likes.Count(l => l.PostId == c.PostId),
+                    Liked = c.Likes.Any(l => l.UserId == userId && l.PostId == c.PostId),
                     User = new User
                     {
                         UserId = c.User.UserId,
@@ -167,7 +166,7 @@ namespace FacebookAPI.App_Code.DAL
         {
             try
             {
-                var dataPost = await FindPostByIdAsync(post.PostId, false);
+                var dataPost = await FindPostByIdAsync(post.PostId);
                 dataPost.PostBody = post.PostBody;
 
                 _context.Posts.Update(dataPost);
@@ -183,9 +182,9 @@ namespace FacebookAPI.App_Code.DAL
             }
         }
 
-        public async Task<CorePost> GetPostByIdAsync(int id, bool? includeComments = null)
+        public async Task<CorePost> GetPostByIdAsync(int id, int userId, bool? includeComments = null)
         {
-            var dataPost = await FindPostByIdAsync(id);
+            var dataPost = await FindPostByIdAsync(id, userId);
 
             if (includeComments == true)
             {
@@ -197,7 +196,7 @@ namespace FacebookAPI.App_Code.DAL
 
         public async Task DeletePostAsync(int id)
         {
-            var dataPost = await FindPostByIdAsync(id, false);
+            var dataPost = await FindPostByIdAsync(id);
 
             dataPost.Comments = await FindCommentsByPostId(id, false);
 
@@ -276,27 +275,27 @@ namespace FacebookAPI.App_Code.DAL
                 .ToListAsync();
         }
 
-        private Task<Post> FindPostByIdAsync(int id, bool includeUser = true)
+        private Task<Post> FindPostByIdAsync(int id)
         {
-            if (!includeUser)
+            return _context.Posts.FirstOrDefaultAsync(p => p.PostId == id);
+        }
+        
+        private Task<Post> FindPostByIdAsync(int id, int userId)
+        {
+            return _context.Posts.Select(p => new Post
             {
-                return _context.Posts.FirstOrDefaultAsync(p => p.PostId == id);
-            }
-            else
-            {
-                return _context.Posts.Select(p => new Post
+                PostId = p.PostId,
+                PostBody = p.PostBody,
+                DatePosted = p.DatePosted,
+                LikeCount = p.Likes.Count(l => l.PostId == p.PostId),
+                Liked = p.Likes.Any(a => a.PostId == p.PostId && a.UserId == userId),
+                User = new User
                 {
-                    PostId = p.PostId,
-                    PostBody = p.PostBody,
-                    DatePosted = p.DatePosted,
-                    User = new User
-                    {
-                        UserId = p.User.UserId,
-                        FirstName = p.User.FirstName,
-                        LastName = p.User.LastName,
-                    }
-                }).FirstOrDefaultAsync(a => a.PostId == id);
-            }
+                    UserId = p.User.UserId,
+                    FirstName = p.User.FirstName,
+                    LastName = p.User.LastName,
+                }
+            }).FirstOrDefaultAsync(a => a.PostId == id);
         }
 
         private Task<List<Comment>> FindCommentsByPostId(int id, bool includeUser = true)

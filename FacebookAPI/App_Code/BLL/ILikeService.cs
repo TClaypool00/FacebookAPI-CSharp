@@ -13,7 +13,5 @@ namespace FacebookAPI.App_Code.BLL
         public string LikeDoesNotExistMessage { get; }
 
         public string LikeExistMessage { get; }
-
-        public string LikeIdMessage { get; }
     }
 }

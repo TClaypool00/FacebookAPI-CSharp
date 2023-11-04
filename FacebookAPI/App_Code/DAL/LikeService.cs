@@ -9,17 +9,14 @@ namespace FacebookAPI.App_Code.DAL
     {
         private LikeOptions _likeOption;
         private int _id;
-        private readonly string _errorMessage;
 
-        public string LikeDoesNotExistMessage => "Like does not exists";
+        public string LikeDoesNotExistMessage => $"{_tableName} {_doesNotExistMessage}";
 
-        public string LikeExistMessage => "Like already exists";
-
-        public string LikeIdMessage => "Like Id must be greater than 0";
+        public string LikeExistMessage => $"{_tableName} {_alreadyExists}";
 
         public LikeService(IConfiguration configuration, FacebookDbContext context) : base(configuration, context)
         {
-            _errorMessage = "Not valid option";
+            _tableName = _configuration["tableNames:Like"];
         }
 
         public async Task<Tuple<int, bool>> AddLikeAsync(int id, int userId, Like.LikeOptions likeOptions)
@@ -50,7 +47,7 @@ namespace FacebookAPI.App_Code.DAL
                     LikeOptions.Comment => await _context.Likes.FirstOrDefaultAsync(l => l.CommentId == id && l.UserId == userId),
                     LikeOptions.Reply => await _context.Likes.FirstOrDefaultAsync(l => l.ReplyId == id && l.UserId == userId),
                     LikeOptions.Picture => await _context.Likes.FirstOrDefaultAsync(l => l.PictureId == id && l.UserId == userId),
-                    _ => throw new ApplicationException(_errorMessage),
+                    _ => throw new ArgumentException(_invalidOption),
                 };
 
                 _context.Likes.Remove(like);
@@ -74,7 +71,7 @@ namespace FacebookAPI.App_Code.DAL
                 LikeOptions.Comment => _context.Likes.AnyAsync(l => l.CommentId == _id && l.UserId == userId),
                 LikeOptions.Reply => _context.Likes.AnyAsync(l => l.ReplyId == _id && l.UserId == userId),
                 LikeOptions.Picture => _context.Likes.AnyAsync(l => l.PictureId == _id && l.UserId == userId),
-                _ => throw new ApplicationException(_errorMessage),
+                _ => throw new ArgumentException(_invalidOption),
             };
         }
 
@@ -91,7 +88,7 @@ namespace FacebookAPI.App_Code.DAL
                 case LikeOptions.Picture:
                     return _context.Likes.Where(l => l.PictureId == _id).CountAsync(); ;
                 default:
-                    throw new ApplicationException(_errorMessage);
+                    throw new ArgumentException(_invalidOption);
             }
         }
 

@@ -7,8 +7,10 @@
         #endregion
 
         #region Constructors
-        public LikeViewModel(Tuple<int, bool> tuple)
+        public LikeViewModel(Tuple<int, bool> likeTurple)
         {
+            _likeTurple = likeTurple ?? throw new ArgumentNullException(nameof(likeTurple));
+
             LikeCount = _likeTurple.Item1;
             Liked = _likeTurple.Item2;
         }

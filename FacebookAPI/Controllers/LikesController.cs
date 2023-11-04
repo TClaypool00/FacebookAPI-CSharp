@@ -32,6 +32,46 @@ namespace FacebookAPI.Controllers
         #endregion
 
         #region Public Methods
+        [HttpPost("AddPostLike")]
+        public async Task<ActionResult> PostLikePostAsync([FromBody] PostLikeViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return DisplayErrors();
+                }
+
+                if (!await _userService.UserExistsAsync(model.UserId))
+                {
+                    return NotFound(_userService.UserDoesNotExistsMessage);
+                }
+
+                if (!IsAdmin && !IsUserIdSame(model.UserId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                if (!await _postService.PostExistsAsync(model.Id))
+                {
+                    return NotFound(_postService.PostDoesNotExistMessage);
+                }
+
+                if (await _likeService.LikeExistsAsync(model.Id, model.UserId, Like.LikeOptions.Post))
+                {
+                    return BadRequest(_likeService.LikeExistMessage);
+                }
+
+                var like = await _likeService.AddLikeAsync(model.Id, model.UserId, Like.LikeOptions.Post);
+
+                return Ok(new LikeViewModel(like));
+            }
+            catch (Exception e)
+            {
+                return InternalError(e);
+            }
+        }
+
         [HttpPost("AddCommentLike")]
         public async Task<ActionResult> PostLikeCommentAsync([FromBody] PostLikeViewModel model)
         {

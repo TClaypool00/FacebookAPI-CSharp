@@ -1,6 +1,7 @@
 ﻿using FacebookAPI.App_Code.BLL;
 using FacebookAPI.App_Code.BOL;
 using FacebookAPI.App_Code.CoreModels;
+using FacebookAPI.App_Code.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace FacebookAPI.App_Code.DAL
@@ -48,6 +49,31 @@ namespace FacebookAPI.App_Code.DAL
         public async Task DeleteCommentAsync(int id)
         {
             var comment = await FindCommentByIdAsync(id);
+
+            comment.Replies = await _context.Replies.Where(x => x.CommentId == id).ToListAsync();
+
+            var helper = new DataEnttiyHelper();
+
+            var replyIds = helper.GetIds(comment.Replies);
+
+            comment.Likes = await _context.Likes.Where(x => replyIds.Contains((int)x.ReplyId)).ToListAsync();
+
+            if (comment.Likes.Count > 0)
+            {
+                _context.Likes.RemoveRange(comment.Likes);
+                await SaveAsync();
+            }
+
+            _context.Replies.RemoveRange(comment.Replies);
+            await SaveAsync();
+
+            comment.Likes = await _context.Likes.Where(x => x.CommentId == id).ToListAsync();
+
+            if (comment.Likes.Count > 0)
+            {
+                _context.Likes.RemoveRange(comment.Likes);
+                await SaveAsync();
+            }
 
             _context.Comments.Remove(comment);
             await SaveAsync();

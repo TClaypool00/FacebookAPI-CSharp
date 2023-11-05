@@ -62,7 +62,7 @@ namespace FacebookAPI.App_Code.DAL
             await SaveAsync();
         }
 
-        public async Task<List<CoreReply>> GetRepliesAsync(int? index = null, int? userId = null, int? commentId = null, int? postId = null)
+        public async Task<List<CoreReply>> GetRepliesAsync(int currentUserId, int? index = null, int? userId = null, int? commentId = null, int? postId = null)
         {
             ConfigureIndex(index);
             List<Reply> replies = null;
@@ -79,6 +79,8 @@ namespace FacebookAPI.App_Code.DAL
                         DatePosted = r.DatePosted,
                         DateUpdated = r.DateUpdated,
                         CommentId = r.CommentId,
+                        Liked = r.Likes.Any(a => a.ReplyId == r.ReplyId && a.UserId == currentUserId),
+                        LikeCount = r.Likes.Count(a => a.ReplyId == r.ReplyId),
                         User = new User
                         {
                             UserId = r.User.UserId,
@@ -86,8 +88,8 @@ namespace FacebookAPI.App_Code.DAL
                             LastName = r.User.LastName
                         }
                     })
-                    .Take(_takeValue)
                     .Skip(_index)
+                    .Take(_takeValue)
                     .ToListAsync();
             }
 
@@ -104,6 +106,8 @@ namespace FacebookAPI.App_Code.DAL
                         DatePosted = r.DatePosted,
                         DateUpdated = r.DateUpdated,
                         CommentId = r.CommentId,
+                        Liked = r.Likes.Any(a => a.ReplyId == r.ReplyId && a.UserId == currentUserId),
+                        LikeCount = r.Likes.Count(a => a.ReplyId == r.ReplyId),
                         User = new User
                         {
                             UserId = r.User.UserId,
@@ -111,8 +115,8 @@ namespace FacebookAPI.App_Code.DAL
                             LastName = r.User.LastName
                         }
                     })
-                    .Take(_takeValue)
                     .Skip(_index)
+                    .Take(_takeValue)
                     .ToListAsync();
                 }
                 else
@@ -139,6 +143,8 @@ namespace FacebookAPI.App_Code.DAL
                         DatePosted = r.DatePosted,
                         DateUpdated = r.DateUpdated,
                         CommentId = r.CommentId,
+                        Liked = r.Likes.Any(a => a.ReplyId == r.ReplyId && a.UserId == currentUserId),
+                        LikeCount = r.Likes.Count(a => a.ReplyId == r.ReplyId),
                         User = new User
                         {
                             UserId = r.User.UserId,
@@ -146,8 +152,8 @@ namespace FacebookAPI.App_Code.DAL
                             LastName = r.User.LastName
                         }
                     })
-                    .Take(_takeValue)
                     .Skip(_index)
+                    .Take(_takeValue)
                     .ToListAsync();
                 }
                 else
@@ -167,7 +173,7 @@ namespace FacebookAPI.App_Code.DAL
             return coreReplies;
         }
 
-        public async Task<CoreReply> GetReplyAsync(int id)
+        public async Task<CoreReply> GetReplyAsync(int id, int userId)
         {
             var reply = await _context.Replies
                 .Select(r => new Reply
@@ -177,6 +183,8 @@ namespace FacebookAPI.App_Code.DAL
                     DatePosted = r.DatePosted,
                     DateUpdated = r.DateUpdated,
                     CommentId = r.CommentId,
+                    Liked = r.Likes.Any(a => a.ReplyId == id && a.UserId == userId),
+                    LikeCount = r.Likes.Count(a => a.ReplyId == r.ReplyId),
                     User = new User
                     {
                         UserId = r.User.UserId,
@@ -184,6 +192,9 @@ namespace FacebookAPI.App_Code.DAL
                         LastName = r.User.LastName,
                     }
                 }).FirstOrDefaultAsync(a => a.ReplyId == id);
+
+            reply.LikeCount = await _context.Likes.CountAsync(a => a.ReplyId == id);
+            reply.Liked = await _context.Likes.AnyAsync(a => a.ReplyId == id && a.UserId == userId);
 
             return new CoreReply(reply);
         }

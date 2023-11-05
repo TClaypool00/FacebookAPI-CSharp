@@ -133,7 +133,7 @@ namespace FacebookAPI.Controllers
                     return Unauthorized(UnAuthorizedMessage);
                 }
 
-                var reply = await _replyService.GetReplyAsync(id);
+                var reply = await _replyService.GetReplyAsync(id, UserId);
 
                 return Ok(new ReplyViewModel(reply));
             }
@@ -158,7 +158,7 @@ namespace FacebookAPI.Controllers
                     return Unauthorized(UnAuthorizedMessage);
                 }
 
-                var coreReplies = await _replyService.GetRepliesAsync(index, userId, commentId, postId);
+                var coreReplies = await _replyService.GetRepliesAsync(UserId, index, userId, commentId, postId);
 
                 if (coreReplies.Count == 0)
                 {

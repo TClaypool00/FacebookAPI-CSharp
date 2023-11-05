@@ -37,6 +37,8 @@ namespace FacebookAPI.App_Code.CoreModels
             DatePosted = _reply.DatePosted;
             DateUpdated = _reply.DateUpdated;
             CommentId = _reply.CommentId;
+            Liked = _reply.Liked;
+            LikeCount = _reply.LikeCount;
 
             if (_reply.Comment is not null)
             {

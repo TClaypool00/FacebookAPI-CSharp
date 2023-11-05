@@ -50,6 +50,14 @@ namespace FacebookAPI.App_Code.DAL
         {
             var dataReply = await FindReplyByIdAsync(id);
 
+            dataReply.Likes = await _context.Likes.Where(x => x.ReplyId == id).ToListAsync();
+
+            if (dataReply.Likes.Count > 0)
+            {
+                _context.Likes.RemoveRange(dataReply.Likes);
+                await SaveAsync();
+            }
+
             _context.Replies.Remove(dataReply);
             await SaveAsync();
         }

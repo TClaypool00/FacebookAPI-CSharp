@@ -79,8 +79,8 @@ namespace FacebookAPI.App_Code.DAL
                         DatePosted = r.DatePosted,
                         DateUpdated = r.DateUpdated,
                         CommentId = r.CommentId,
-                        Liked = r.Likes.Any(a => a.ReplyId == r.ReplyId && a.UserId == currentUserId),
-                        LikeCount = r.Likes.Count(a => a.ReplyId == r.ReplyId),
+                        Liked = r.Likes.Any(a => a.UserId == currentUserId),
+                        LikeCount = r.Likes.Count,
                         User = new User
                         {
                             UserId = r.User.UserId,
@@ -106,8 +106,8 @@ namespace FacebookAPI.App_Code.DAL
                         DatePosted = r.DatePosted,
                         DateUpdated = r.DateUpdated,
                         CommentId = r.CommentId,
-                        Liked = r.Likes.Any(a => a.ReplyId == r.ReplyId && a.UserId == currentUserId),
-                        LikeCount = r.Likes.Count(a => a.ReplyId == r.ReplyId),
+                        Liked = r.Likes.Any(a => a.UserId == currentUserId),
+                        LikeCount = r.Likes.Count,
                         User = new User
                         {
                             UserId = r.User.UserId,
@@ -143,8 +143,8 @@ namespace FacebookAPI.App_Code.DAL
                         DatePosted = r.DatePosted,
                         DateUpdated = r.DateUpdated,
                         CommentId = r.CommentId,
-                        Liked = r.Likes.Any(a => a.ReplyId == r.ReplyId && a.UserId == currentUserId),
-                        LikeCount = r.Likes.Count(a => a.ReplyId == r.ReplyId),
+                        Liked = r.Likes.Any(a => a.UserId == currentUserId),
+                        LikeCount = r.Likes.Count,
                         User = new User
                         {
                             UserId = r.User.UserId,
@@ -183,8 +183,8 @@ namespace FacebookAPI.App_Code.DAL
                     DatePosted = r.DatePosted,
                     DateUpdated = r.DateUpdated,
                     CommentId = r.CommentId,
-                    Liked = r.Likes.Any(a => a.ReplyId == id && a.UserId == userId),
-                    LikeCount = r.Likes.Count(a => a.ReplyId == r.ReplyId),
+                    Liked = r.Likes.Any(a => a.UserId == userId),
+                    LikeCount = r.Likes.Count,
                     User = new User
                     {
                         UserId = r.User.UserId,
@@ -192,9 +192,6 @@ namespace FacebookAPI.App_Code.DAL
                         LastName = r.User.LastName,
                     }
                 }).FirstOrDefaultAsync(a => a.ReplyId == id);
-
-            reply.LikeCount = await _context.Likes.CountAsync(a => a.ReplyId == id);
-            reply.Liked = await _context.Likes.AnyAsync(a => a.ReplyId == id && a.UserId == userId);
 
             return new CoreReply(reply);
         }

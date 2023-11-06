@@ -120,8 +120,6 @@ namespace FacebookAPI.App_Code.DAL
             {
                 comments = await _context.Comments
                     .Where(u => u.UserId == userId)
-                    .Take(_takeValue)
-                    .Skip(_index)
                     .Select(c => new Comment
                     {
                         CommentId = c.CommentId,
@@ -136,14 +134,14 @@ namespace FacebookAPI.App_Code.DAL
                             LastName = c.User.LastName,
                         }
                     })
+                    .Skip(_index)
+                    .Take(_takeValue)
                     .ToListAsync();
             }
             else
             {
                 comments = await _context.Comments
                     .Where(u => u.UserId == userId && u.PostId == postId)
-                    .Take(_takeValue)
-                    .Skip(_index)
                     .Select(c => new Comment
                     {
                         CommentId = c.CommentId,
@@ -158,6 +156,8 @@ namespace FacebookAPI.App_Code.DAL
                             LastName = c.User.LastName,
                         }
                     })
+                    .Take(_takeValue)
+                    .Skip(_index)
                     .ToListAsync();
             }
 

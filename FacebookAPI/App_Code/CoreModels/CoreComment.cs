@@ -48,6 +48,16 @@ namespace FacebookAPI.App_Code.CoreModels
             {
                 Post = new CorePost(_comment.Post);
             }
+
+            if (_comment.Replies is not null && _comment.Replies.Count > 0)
+            {
+                Replies = new List<CoreReply>();
+
+                for (int i = 0; i < _comment.Replies.Count; i++)
+                {
+                    Replies.Add(new CoreReply(_comment.Replies[i]));
+                }
+            }
         }
 
         public CoreComment(PostCommentViewModel postComentModel)
@@ -70,17 +80,14 @@ namespace FacebookAPI.App_Code.CoreModels
 
         public int PostId { get; set; }
         public CorePost Post { get; set; }
+
+        public List<CoreReply> Replies { get; set; }
         #endregion
 
         #region Private methods
         private void Construct(PostCommentViewModel postComentModel)
         {
-            if (postComentModel is null)
-            {
-                throw new ArgumentNullException(nameof(postComentModel));
-            }
-
-            _postComentModel = postComentModel;
+            _postComentModel = postComentModel ?? throw new ArgumentNullException(nameof(postComentModel));;
 
             CommentBody = _postComentModel.CommentBody;
             PostId = _postComentModel.PostId;

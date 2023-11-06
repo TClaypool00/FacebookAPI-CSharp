@@ -127,7 +127,7 @@ namespace FacebookAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetCommentByIdAync(int id)
+        public async Task<ActionResult> GetCommentByIdAync(int id, [FromQuery] bool? includeComments = null)
         {
             try
             {
@@ -141,7 +141,7 @@ namespace FacebookAPI.Controllers
                     return NotFound(_commentService.CommentNotFoundMessage);
                 }
 
-                var coreComment = await _commentService.GetCommentAsync(id);
+                var coreComment = await _commentService.GetCommentAsync(id, UserId, includeComments);
 
                 return Ok(new CommentViewModel(coreComment));
             }
@@ -152,11 +152,11 @@ namespace FacebookAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetCommentsAsync(int userId, int? index = null, int? postId = null)
+        public async Task<ActionResult> GetCommentsAsync([FromQuery] int userId, int? index = null, int? postId = null, bool? includeReplies = null)
         {
             try
             {
-                var coreComments = await _commentService.GetCommentsAsync(userId, index, postId);
+                var coreComments = await _commentService.GetCommentsAsync(userId, index, postId, includeReplies);
 
                 if (coreComments.Count == 0)
                 {

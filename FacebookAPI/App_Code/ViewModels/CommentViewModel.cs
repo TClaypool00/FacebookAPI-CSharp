@@ -6,8 +6,11 @@ namespace FacebookAPI.App_Code.ViewModels
 {
     public class CommentViewModel : PostCommentViewModel, IBaseViewModel
     {
+        #region Private Fields
         private CoreComment _coreComment;
+        #endregion
 
+        #region Constructors
         public CommentViewModel(CoreComment coreComment)
         {
             Construct(coreComment);
@@ -17,10 +20,13 @@ namespace FacebookAPI.App_Code.ViewModels
         {
             Construct(coreComment);
             Message = message;
-
         }
+        #endregion
 
 
+        #region Public Properties
+        public List<ReplyViewModel> Replies { get; set; }
+        #region Inherited Proprties
         public int CommentId { get; set; }
         public string UserDisplayName { get => _userDisplayName; set => _userDisplayName = value; }
         public string DatePosted { get => _datePosted; set => _datePosted = value; }
@@ -28,6 +34,8 @@ namespace FacebookAPI.App_Code.ViewModels
         public int LikeCount { get => _likeCount; set => _likeCount = value; }
         public bool Liked { get => _liked; set => _liked = value; }
         public string Message { get => _message; set => _message = value; }
+        #endregion
+        #endregion
 
         private void Construct(CoreComment coreComment)
         {
@@ -48,6 +56,16 @@ namespace FacebookAPI.App_Code.ViewModels
             {
                 UserId = _coreComment.User.UserId;
                 UserDisplayName = _coreComment.User.ProtectedName;
+            }
+
+            if (_coreComment.Replies is not null && _coreComment.Replies.Count > 0)
+            {
+                Replies = new List<ReplyViewModel>();
+
+                for (int i = 0; i < _coreComment.Replies.Count; i++)
+                {
+                    Replies.Add(new ReplyViewModel(_coreComment.Replies[i]));
+                }
             }
         }
     }

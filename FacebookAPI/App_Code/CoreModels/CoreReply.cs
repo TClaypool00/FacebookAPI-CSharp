@@ -8,7 +8,7 @@ namespace FacebookAPI.App_Code.CoreModels
     {
         #region Private fields
         private PostReplyViewModel _postReplyViewModel;
-        private Reply _reply;
+        private readonly Reply _reply;
         #endregion
 
         #region Constructors

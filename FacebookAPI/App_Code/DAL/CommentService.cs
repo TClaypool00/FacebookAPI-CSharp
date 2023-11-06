@@ -79,19 +79,42 @@ namespace FacebookAPI.App_Code.DAL
             await SaveAsync();
         }
 
-        public async Task<CoreComment> GetCommentAsync(int id)
+        public async Task<CoreComment> GetCommentAsync(int id, int userId, bool? includeReplies = null)
         {
             var comment = await FindCommentByIdAsync(id, true);
+
+            if (includeReplies == true)
+            {
+                comment.Replies = await _context.Replies.Select(x => new Reply
+                {
+                    ReplyId = x.ReplyId,
+                    ReplyBody = x.ReplyBody,
+                    DatePosted = x.DatePosted,
+                    DateUpdated = x.DateUpdated,
+                    CommentId = x.CommentId,
+                    LikeCount = x.Likes.Count(a => a.ReplyId == x.ReplyId),
+                    Liked = x.Likes.Any(a => a.ReplyId == x.ReplyId && a.UserId == userId),
+                    User = new User
+                    {
+                        UserId = x.User.UserId,
+                        FirstName = x.User.FirstName,
+                        LastName = x.User.LastName
+                    }
+                })
+                .Take(_subTakeValue)
+                .ToListAsync();
+            }
 
             return new CoreComment(comment);
         }
 
-        public async Task<List<CoreComment>> GetCommentsAsync(int userId, int? index = null, int? postId = null)
+        public async Task<List<CoreComment>> GetCommentsAsync(int userId, int? index = null, int? postId = null, bool? includeReplies = null)
         {
             ConfigureIndex(index);
 
             var coreComments = new List<CoreComment>();
             List<Comment> comments;
+            Comment comment;
 
             if (postId is null)
             {
@@ -142,7 +165,33 @@ namespace FacebookAPI.App_Code.DAL
             {
                 for (int i = 0; i < comments.Count; i++)
                 {
-                    coreComments.Add(new CoreComment(comments[i]));
+                    comment = comments[i];
+                    
+                    if (includeReplies == true)
+                    {
+                        comment.Replies = await _context.Replies
+                            .Where(c => c.CommentId == comment.CommentId)
+                            .Select(x => new Reply
+                            {
+                                ReplyId = x.ReplyId,
+                                ReplyBody = x.ReplyBody,
+                                DatePosted = x.DatePosted,
+                                DateUpdated = x.DateUpdated,
+                                CommentId = x.CommentId,
+                                LikeCount  = x.Likes.Count,
+                                Liked = x.Likes.Any(b => b.UserId == userId),
+                                User = new User
+                                {
+                                    UserId = x.User.UserId,
+                                    FirstName = x.User.FirstName,
+                                    LastName = x.User.LastName
+                                }
+                            })
+                            .Take(_subTakeValue)
+                            .ToListAsync();
+                    }
+
+                    coreComments.Add(new CoreComment(comment));
                 }
             }
 

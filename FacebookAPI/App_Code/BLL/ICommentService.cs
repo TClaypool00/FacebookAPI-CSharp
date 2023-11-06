@@ -5,13 +5,13 @@ namespace FacebookAPI.App_Code.BLL
     public interface ICommentService
     {
         #region Public Properties
-        public Task<List<CoreComment>> GetCommentsAsync(int userId, int? index = null, int? postId = null);
+        public Task<List<CoreComment>> GetCommentsAsync(int userId, int? index = null, int? postId = null, bool? includeReplies = null);
 
         public Task<CoreComment> AddCommentAsync(CoreComment comment);
 
         public Task<CoreComment> UpdateCommentAsync(CoreComment comment);
 
-        public Task<CoreComment> GetCommentAsync(int id);
+        public Task<CoreComment> GetCommentAsync(int id, int userId, bool? includeReplies = null);
 
         public Task<bool> CommentExistsAsync(int id);
 

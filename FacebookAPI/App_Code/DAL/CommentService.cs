@@ -114,6 +114,7 @@ namespace FacebookAPI.App_Code.DAL
 
             var coreComments = new List<CoreComment>();
             List<Comment> comments;
+            List<Reply> replies = null;
             Comment comment;
 
             if (postId is null)
@@ -163,14 +164,13 @@ namespace FacebookAPI.App_Code.DAL
 
             if (comments.Count > 0)
             {
-                for (int i = 0; i < comments.Count; i++)
+                if (includeReplies == true)
                 {
-                    comment = comments[i];
-                    
-                    if (includeReplies == true)
-                    {
-                        comment.Replies = await _context.Replies
-                            .Where(c => c.CommentId == comment.CommentId)
+                    var helper = new DataEnttiyHelper();
+                    var commentIds = helper.GetIds(comments);
+
+                    replies = await _context.Replies
+                            .Where(f => commentIds.Contains(f.CommentId))
                             .Select(x => new Reply
                             {
                                 ReplyId = x.ReplyId,
@@ -178,7 +178,7 @@ namespace FacebookAPI.App_Code.DAL
                                 DatePosted = x.DatePosted,
                                 DateUpdated = x.DateUpdated,
                                 CommentId = x.CommentId,
-                                LikeCount  = x.Likes.Count,
+                                LikeCount = x.Likes.Count,
                                 Liked = x.Likes.Any(b => b.UserId == userId),
                                 User = new User
                                 {
@@ -189,8 +189,12 @@ namespace FacebookAPI.App_Code.DAL
                             })
                             .Take(_subTakeValue)
                             .ToListAsync();
-                    }
+                }
 
+                for (int i = 0; i < comments.Count; i++)
+                {
+                    comment = comments[i];
+                    comment.Replies = replies.Where(a => a.CommentId == comment.CommentId).ToList();
                     coreComments.Add(new CoreComment(comment));
                 }
             }

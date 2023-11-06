@@ -152,11 +152,21 @@ namespace FacebookAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetCommentsAsync([FromQuery] int userId, int? index = null, int? postId = null, bool? includeReplies = null)
+        public async Task<ActionResult> GetCommentsAsync([FromQuery] int? userId = null, int? index = null, int? postId = null, bool? includeReplies = null)
         {
             try
             {
-                var coreComments = await _commentService.GetCommentsAsync(userId, index, postId, includeReplies);
+                if (AllParametersNull(userId, postId))
+                {
+                    return BadRequest(AllParametersNullMessage);
+                }
+
+                if (!IsAdmin && !IsUserIdSame(userId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                var coreComments = await _commentService.GetCommentsAsync(UserId, userId, index, postId, includeReplies);
 
                 if (coreComments.Count == 0)
                 {

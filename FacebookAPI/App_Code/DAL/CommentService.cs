@@ -108,19 +108,24 @@ namespace FacebookAPI.App_Code.DAL
             return new CoreComment(comment);
         }
 
-        public async Task<List<CoreComment>> GetCommentsAsync(int userId, int? index = null, int? postId = null, bool? includeReplies = null)
+        public async Task<List<CoreComment>> GetCommentsAsync(int currentUserId, int? userId = null, int? index = null, int? postId = null, bool? includeReplies = null)
         {
             ConfigureIndex(index);
 
+            if (userId is null)
+            {
+                userId = currentUserId;
+            }
+
             var coreComments = new List<CoreComment>();
-            List<Comment> comments;
+            List<Comment> comments = null;
             List<Reply> replies = null;
             Comment comment;
 
-            if (postId is null)
+            if (postId is not null)
             {
                 comments = await _context.Comments
-                    .Where(u => u.UserId == userId)
+                    .Where(u => u.PostId == postId)
                     .Select(c => new Comment
                     {
                         CommentId = c.CommentId,
@@ -139,10 +144,13 @@ namespace FacebookAPI.App_Code.DAL
                     .Take(_takeValue)
                     .ToListAsync();
             }
-            else
+
+            if (userId is not null)
             {
-                comments = await _context.Comments
-                    .Where(u => u.UserId == userId && u.PostId == postId)
+                if (comments is null)
+                {
+                    comments = await _context.Comments
+                    .Where(u => u.UserId == userId)
                     .Select(c => new Comment
                     {
                         CommentId = c.CommentId,
@@ -160,9 +168,14 @@ namespace FacebookAPI.App_Code.DAL
                     .Take(_takeValue)
                     .Skip(_index)
                     .ToListAsync();
+                }
+                else
+                {
+                    comments = comments.Where(u => u.UserId == userId).ToList();
+                }
             }
 
-            if (comments.Count > 0)
+            if (comments is not null && comments.Count > 0)
             {
                 if (includeReplies == true)
                 {
@@ -194,7 +207,10 @@ namespace FacebookAPI.App_Code.DAL
                 for (int i = 0; i < comments.Count; i++)
                 {
                     comment = comments[i];
-                    comment.Replies = replies.Where(a => a.CommentId == comment.CommentId).ToList();
+                    if (includeReplies == true)
+                    {
+                        comment.Replies = replies.Where(a => a.CommentId == comment.CommentId).ToList();
+                    }
                     coreComments.Add(new CoreComment(comment));
                 }
             }

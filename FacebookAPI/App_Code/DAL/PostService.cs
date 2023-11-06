@@ -1,6 +1,7 @@
 ﻿using FacebookAPI.App_Code.BLL;
 using FacebookAPI.App_Code.BOL;
 using FacebookAPI.App_Code.CoreModels;
+using FacebookAPI.App_Code.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace FacebookAPI.App_Code.DAL
@@ -50,13 +51,23 @@ namespace FacebookAPI.App_Code.DAL
             }
         }
 
-        public async Task<List<CorePost>> GetAllPostsAsync(int userId, int? index = null, bool? includeComments = null)
+        public async Task<List<CorePost>> GetAllPostsAsync(int userId, int? index = null, bool? includeComments = null, bool? includeReplies = null)
         {
             ConfigureIndex(index);
 
             var corPosts = new List<CorePost>();
             List<Comment> comments = null;
             List<Post> posts;
+            List<Reply> replies = null;
+            Comment comment = null;
+
+            if (includeReplies == true)
+            {
+                includeComments = true;
+            } else if (includeComments != true)
+            {
+                includeReplies = null;
+            }
 
             posts = await _context.Posts
                     .Where(a => a.User.UserId == userId)
@@ -79,22 +90,62 @@ namespace FacebookAPI.App_Code.DAL
                     .Skip(_index)
                     .ToListAsync();
 
-            if (includeComments == true)
+            if (posts is not null && posts.Count > 0)
             {
-                var postIds = PostIdsList(posts);
-                comments = await FindComments(postIds);
-            }
-
-            for (int i = 0; i < posts.Count; i++)
-            {
-                var post = posts[i];
+                var helper = new DataEnttiyHelper();
 
                 if (includeComments == true)
                 {
-                    post.Comments = comments.Where(a => a.PostId == post.PostId).ToList();
+                    var postIds = helper.GetIds(posts);
+                    comments = await FindComments(postIds);
                 }
 
-                corPosts.Add(new CorePost(posts[i]));
+                if (includeReplies == true)
+                {
+                    var commentIds = helper.GetIds(comments);
+                    replies = await _context.Replies
+                        .Where(a => commentIds.Contains(a.CommentId))
+                        .Select(b => new Reply
+                        {
+                            ReplyId = b.ReplyId,
+                            ReplyBody = b.ReplyBody,
+                            DatePosted = b.DatePosted,
+                            DateUpdated = b.DateUpdated,
+                            CommentId = b.CommentId,
+                            LikeCount = b.Likes.Count,
+                            Liked = b.Likes.Any(l => l.UserId == userId),
+                            User = new User
+                            {
+                                UserId = b.User.UserId,
+                                FirstName = b.User.FirstName,
+                                LastName = b.User.LastName
+                            }
+                        })
+                        .Take(_subTakeValue)
+                        .ToListAsync();
+                }
+
+                for (int i = 0; i < posts.Count; i++)
+                {
+                    var post = posts[i];
+
+                    if (includeComments == true)
+                    {
+                        post.Comments = comments.Where(a => a.PostId == post.PostId).ToList();
+
+                        if (includeReplies == true && post.Comments.Count > 0)
+                        {
+                            for (int j = 0; j < post.Comments.Count; j++)
+                            {
+                                comment = post.Comments[j];
+
+                                comment.Replies = replies.Where(z => z.CommentId == comment.CommentId).ToList();
+                            }
+                        }
+                    }
+
+                    corPosts.Add(new CorePost(posts[i]));
+                }
             }
 
             return corPosts;

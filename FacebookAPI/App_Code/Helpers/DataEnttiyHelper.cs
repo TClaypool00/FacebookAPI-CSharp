@@ -38,6 +38,21 @@ namespace FacebookAPI.App_Code.Helpers
 
             return _ids;
         }
+
+        public List<int> GetIds(List<Post> posts)
+        {
+            _ids = new List<int>();
+
+            for(int i = 0;i < posts.Count; i++)
+            {
+                if (!Exists(posts[i].PostId))
+                {
+                    _ids.Add(posts[i].PostId);
+                }
+            }
+
+            return _ids;
+        }
         #endregion
 
         #region Private methods

@@ -146,7 +146,7 @@ namespace FacebookAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetAllPosts([FromQuery] int userId, int? index = null, bool? includeComments = null)
+        public async Task<ActionResult> GetAllPosts([FromQuery] int userId, int? index = null, bool? includeComments = null, bool? includeReplies = null)
         {
             try
             {
@@ -155,7 +155,7 @@ namespace FacebookAPI.Controllers
                     return Unauthorized(UnAuthorizedMessage);
                 }
 
-                var corePosts = await _postService.GetAllPostsAsync(userId, index, includeComments);
+                var corePosts = await _postService.GetAllPostsAsync(userId, index, includeComments, includeReplies);
                 
                 if (corePosts.Count == 0)
                 {

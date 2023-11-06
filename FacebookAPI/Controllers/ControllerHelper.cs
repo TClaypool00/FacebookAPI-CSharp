@@ -54,7 +54,7 @@ namespace FacebookAPI.Controllers
         {
             get
             {
-                return User.Claims.FirstOrDefault(c => c.Type == "IsAdmin").Value == "True";
+                return User.Claims.FirstOrDefault(c => c.Type == "Role").Value == "Admin";
             }
         }
         #endregion

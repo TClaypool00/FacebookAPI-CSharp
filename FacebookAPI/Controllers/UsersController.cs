@@ -104,7 +104,7 @@ namespace FacebookAPI.Controllers
                     new Claim("LastName", user.LastName),
                     new Claim("PhoneNumber", user.PhoneNumber),
                     new Claim("Email", user.Email),
-                    new Claim("Role", user.IsAdmin ? "Admin" : "User")
+                    new Claim(ClaimTypes.Role, user.IsAdmin ? "Admin" : "User")
                 };
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretConfig.SecretKey));

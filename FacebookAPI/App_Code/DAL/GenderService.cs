@@ -1,5 +1,6 @@
 ﻿using FacebookAPI.App_Code.BLL;
 using FacebookAPI.App_Code.BOL;
+using FacebookAPI.App_Code.CoreModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,11 +8,66 @@ namespace FacebookAPI.App_Code.DAL
 {
     public class GenderService : ServiceHelper, IGenderService
     {
-        private readonly string _name;
+        private readonly string _genderNameString;
+        private readonly string _genderPronounsString;
 
         public GenderService(FacebookDbContext context, IConfiguration configuration) : base(configuration, context)
         {
-            _name = _configuration.GetSection("tableNames").GetSection("gender").Value;
+            _tableName = _configuration.GetSection("tableNames").GetSection("gender").Value;
+            _genderPronounsString = _configuration["Gender:Pronoun"];
+            _genderNameString = _configuration["Gender:Name"];
+        }
+
+        public string GenderCreatedOKMessage => $"{_tableName} {_addedOKMessage}";
+
+        public string GenderNotFoundMessage => $"{_tableName} {_doesNotExistMessage}";
+
+        public string GenderNameExistsMessage => $"{_genderNameString} {_doesNotExistMessage}";
+
+        public string GenderPronounsExistsMessage => $"{_genderPronounsString} {_doesNotExistMessage}";
+
+        public async Task<CoreGender> AddGenderAsync(CoreGender coreGender)
+        {
+            var dataGender = new Gender(coreGender);
+            await _context.Genders.AddAsync(dataGender);
+            await SaveAsync();
+
+            if (dataGender.GenderId == 0)
+            {
+                throw new ApplicationException($"{_tableName} {_couldNotAddedMessage}");
+            }
+
+            coreGender.GenderId = dataGender.GenderId;
+
+            return coreGender;
+        }
+
+        public Task<bool> GenderExistsAsync(int id)
+        {
+            return _context.Genders.AnyAsync(g => g.GenderId == id);
+        }
+
+        public Task<bool> GenderNameExistsAsync(string genderName, int? id = null)
+        {
+            if (id is null)
+            {
+                return _context.Genders.AnyAsync(g => g.GenderName == genderName);
+            } else
+            {
+                return _context.Genders.AnyAsync(g => g.GenderName == genderName && g.GenderId != id);
+            }
+        }
+
+        public Task<bool> GenderPronounsExists(string pronouns, int? id = null)
+        {
+            if (id is null)
+            {
+                return _context.Genders.AnyAsync(g => g.ProNouns == pronouns);
+            }
+            else
+            {
+                return _context.Genders.AnyAsync(g => g.ProNouns == pronouns && g.GenderId != id);
+            }
         }
 
         public async Task<List<SelectListItem>> GetGenderDropDownAsync(int? genderId = null)
@@ -22,7 +78,7 @@ namespace FacebookAPI.App_Code.DAL
             SelectListItem selectListItem;
             Gender gender;
 
-            genderDropDown.Add(AddDefaultValue(_name, genderId));
+            genderDropDown.Add(AddDefaultValue(_tableName, genderId));
 
             var genders = await _context.Genders.Select(g => new Gender
             {

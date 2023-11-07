@@ -52,6 +52,7 @@ builder.Services.AddDbContext<FacebookDbContext>(options => options.UseMySql(Sec
 
 //Services
 builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IGenderService, GenderService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IPostService, PostService>();

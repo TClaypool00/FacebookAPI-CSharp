@@ -153,47 +153,6 @@ namespace FacebookAPI.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateUserAsync(int id, [FromBody] PostUserProfileViewModel model)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return DisplayErrors();
-                }
-
-                if (!await _userService.UserExistsAsync(id))
-                {
-                    return NotFound(_userService.UserDoesNotExistsMessage);
-                }
-
-                if (!IsUserIdSame(id) && !IsAdmin)
-                {
-                    return Unauthorized(UnAuthorizedMessage);
-                }
-
-                if (await _userService.EmailExistsAsync(model.Email, id))
-                {
-                    return BadRequest(_userService.EmailExistsMessage);
-                }
-
-                if (await _userService.PhoneNumberExistsAsync(model.PhoneNumber, id))
-                {
-                    return BadRequest(_userService.PhoneNumberExistsMessage);
-                }
-
-                var coreUser = new CoreUser(id, model);
-
-                coreUser = await _userService.UpdateUserAsync(id, coreUser);
-
-                return Ok(new FullUserProfileViewModel(coreUser, _userService.UpdatePasswordSuccessMessage));
-            }
-            catch (Exception ex)
-            {
-                return InternalError(ex);
-            }
-        }
         [HttpPut("ChangePassword")]
         public async Task<ActionResult> ChangePasswordAsync([FromBody] PostChangePasswordViewModel model)
         {

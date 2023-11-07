@@ -4,6 +4,7 @@ namespace FacebookAPI.App_Code.BLL
 {
     public interface IUserService
     {
+        #region Public Methods
         public Task CreateUserAsync(CoreUser user);
 
         public Task<bool> PhoneNumberExistsAsync(string phoneNumber, int? id = null);
@@ -18,15 +19,13 @@ namespace FacebookAPI.App_Code.BLL
 
         public Task<CoreUser> GetUserAsync(int id, bool includePassword = false);
 
-        public Task<CoreUser> GetUserProfileAsync(int id, int userId);
-
-        public Task<CoreUser> UpdateUserAsync(int id, CoreUser user);
-
         public Task<CoreUser> GetFullNameAsync(int id);
 
         public Task<List<CoreUser>> GetFriendsAsync(string search, int userId);
+        #endregion
 
 
+        #region Public Properties
         public string UserCreatedMessage { get; }
 
         public string PhoneNumberExistsMessage { get; }
@@ -37,8 +36,7 @@ namespace FacebookAPI.App_Code.BLL
 
         public string EmailDoesNotExistMessage { get; }
 
-        public string UserUpdatedMessage { get; }
-
         public string UpdatePasswordSuccessMessage { get; }
+        #endregion
     }
 }

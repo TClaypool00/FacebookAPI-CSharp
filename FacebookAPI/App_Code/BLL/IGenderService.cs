@@ -12,6 +12,8 @@ namespace FacebookAPI.App_Code.BLL
 
         public Task<CoreGender> UpdateGenderAsync(CoreGender coreGender);
 
+        public Task<CoreGender> GetGenderByIdAsync(int id);
+
         public Task<bool> GenderNameExistsAsync(string genderName, int? id = null);
 
         public Task<bool> GenderPronounsExists(string pronouns,  int? id = null);

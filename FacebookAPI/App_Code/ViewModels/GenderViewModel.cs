@@ -18,6 +18,8 @@ namespace FacebookAPI.App_Code.ViewModels
         public GenderViewModel(CoreGender coreGender)
         {
             Construct(coreGender);
+
+            Message = "";
         }
 
         public GenderViewModel(CoreGender coreGender, string message)

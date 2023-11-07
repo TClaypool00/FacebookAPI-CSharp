@@ -80,6 +80,13 @@ namespace FacebookAPI.App_Code.DAL
             }
         }
 
+        public async Task<CoreGender> GetGenderByIdAsync(int id)
+        {
+            var dataGender = await FindGenderAsync(id);
+
+            return new CoreGender(dataGender);
+        }
+
         public async Task<List<SelectListItem>> GetGenderDropDownAsync(int? genderId = null)
         {
             bool selected;

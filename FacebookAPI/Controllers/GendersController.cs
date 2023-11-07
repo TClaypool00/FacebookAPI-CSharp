@@ -92,6 +92,26 @@ namespace FacebookAPI.Controllers
                 return InternalError(ex);
             }
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetGenderByIdAsync(int id)
+        {
+            try
+            {
+                if (!await _genderService.GenderExistsAsync(id))
+                {
+                    return NotFound(_genderService.GenderNotFoundMessage);
+                }
+
+                var coreGender = await _genderService.GetGenderByIdAsync(id);
+
+                return Ok(new GenderViewModel(coreGender));
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
         #endregion
     }
 }

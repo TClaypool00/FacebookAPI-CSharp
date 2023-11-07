@@ -112,6 +112,22 @@ namespace FacebookAPI.Controllers
                 return InternalError(ex);
             }
         }
+
+        [HttpGet("Dropdown")]
+        [Authorize]
+        public async Task<ActionResult> GetGenderDropDownAsync()
+        {
+            try
+            {
+                var dropdown = await _genderService.GetGenderDropDownAsync();
+
+                return Ok(dropdown);
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
         #endregion
     }
 }

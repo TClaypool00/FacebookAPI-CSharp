@@ -32,6 +32,8 @@ namespace FacebookAPI.App_Code.DAL
         public string GenderPronounsExistsMessage => $"{_genderPronounsString} {_doesNotExistMessage}";
 
         public string GenderUpdatedOKMessage => $"{_tableName} {_updatedOKMessage}";
+
+        public string GendersNotFoundMessage => _configuration["NotFoundMessages:Genders"];
         #endregion
 
         #region Public Methods
@@ -131,6 +133,20 @@ namespace FacebookAPI.App_Code.DAL
             }
 
             return genderDropDown;
+        }
+
+        public async Task<List<CoreGender>> GetGendersAsync()
+        {
+            var genders = new List<CoreGender>();
+            var dataGenders = await _context.Genders
+                .ToListAsync();
+
+            for (int i = 0; i < dataGenders.Count; i++)
+            {
+                genders.Add(new CoreGender(dataGenders[i]));
+            }
+
+            return genders;
         }
 
         public async Task<CoreGender> UpdateGenderAsync(CoreGender coreGender)

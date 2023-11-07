@@ -93,6 +93,33 @@ namespace FacebookAPI.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<ActionResult> GetGendersAsync()
+        {
+            try
+            {
+                var coreGenders = await _genderService.GetGendersAsync();
+
+                if (coreGenders.Count == 0)
+                {
+                    return NotFound(_genderService.GendersNotFoundMessage);
+                }
+                
+                var genderViewModels = new List<GenderViewModel>();
+
+                for (int i = 0; i < coreGenders.Count; i++)
+                {
+                    genderViewModels.Add(new GenderViewModel(coreGenders[i]));
+                }
+
+                return Ok(genderViewModels);
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult> GetGenderByIdAsync(int id)
         {

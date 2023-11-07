@@ -8,6 +8,8 @@ namespace FacebookAPI.App_Code.BLL
         #region Public Methods
         public Task<List<SelectListItem>> GetGenderDropDownAsync(int? genderId = null);
 
+        public Task<List<CoreGender>> GetGendersAsync();
+
         public Task<CoreGender> AddGenderAsync(CoreGender coreGender);
 
         public Task<CoreGender> UpdateGenderAsync(CoreGender coreGender);
@@ -31,6 +33,8 @@ namespace FacebookAPI.App_Code.BLL
         public string GenderNameExistsMessage { get; }
 
         public string GenderPronounsExistsMessage { get; }
+
+        public string GendersNotFoundMessage { get; }
         #endregion
     }
 }

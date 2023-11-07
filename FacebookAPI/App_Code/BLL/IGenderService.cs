@@ -10,6 +10,8 @@ namespace FacebookAPI.App_Code.BLL
 
         public Task<CoreGender> AddGenderAsync(CoreGender coreGender);
 
+        public Task<CoreGender> UpdateGenderAsync(CoreGender coreGender);
+
         public Task<bool> GenderNameExistsAsync(string genderName, int? id = null);
 
         public Task<bool> GenderPronounsExists(string pronouns,  int? id = null);
@@ -19,6 +21,8 @@ namespace FacebookAPI.App_Code.BLL
 
         #region Public Proprties
         public string GenderCreatedOKMessage { get; }
+
+        public string GenderUpdatedOKMessage { get; }
 
         public string GenderNotFoundMessage { get; }
 

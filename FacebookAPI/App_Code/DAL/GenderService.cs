@@ -8,16 +8,21 @@ namespace FacebookAPI.App_Code.DAL
 {
     public class GenderService : ServiceHelper, IGenderService
     {
+        #region Private Fields
         private readonly string _genderNameString;
         private readonly string _genderPronounsString;
+        #endregion
 
+        #region Constructors
         public GenderService(FacebookDbContext context, IConfiguration configuration) : base(configuration, context)
         {
             _tableName = _configuration.GetSection("tableNames").GetSection("gender").Value;
             _genderPronounsString = _configuration["Gender:Pronoun"];
             _genderNameString = _configuration["Gender:Name"];
         }
+        #endregion
 
+        #region Public Properties
         public string GenderCreatedOKMessage => $"{_tableName} {_addedOKMessage}";
 
         public string GenderNotFoundMessage => $"{_tableName} {_doesNotExistMessage}";
@@ -26,6 +31,10 @@ namespace FacebookAPI.App_Code.DAL
 
         public string GenderPronounsExistsMessage => $"{_genderPronounsString} {_doesNotExistMessage}";
 
+        public string GenderUpdatedOKMessage => $"{_tableName} {_updatedOKMessage}";
+        #endregion
+
+        #region Public Methods
         public async Task<CoreGender> AddGenderAsync(CoreGender coreGender)
         {
             var dataGender = new Gender(coreGender);
@@ -52,7 +61,8 @@ namespace FacebookAPI.App_Code.DAL
             if (id is null)
             {
                 return _context.Genders.AnyAsync(g => g.GenderName == genderName);
-            } else
+            }
+            else
             {
                 return _context.Genders.AnyAsync(g => g.GenderName == genderName && g.GenderId != id);
             }
@@ -115,5 +125,28 @@ namespace FacebookAPI.App_Code.DAL
 
             return genderDropDown;
         }
+
+        public async Task<CoreGender> UpdateGenderAsync(CoreGender coreGender)
+        {
+            var dataGender = await FindGenderAsync(coreGender.GenderId);
+            dataGender.GenderName = coreGender.GenderName;
+            dataGender.ProNouns = coreGender.ProNouns;
+
+            _context.Genders.Update(dataGender);
+
+            await SaveAsync();
+
+            DetachEntity(dataGender);
+
+            return coreGender;
+        }
+        #endregion
+
+        #region Private Methods
+        private Task<Gender> FindGenderAsync(int id)
+        {
+            return _context.Genders.FirstOrDefaultAsync(g => g.GenderId == id);
+        }
+        #endregion
     }
 }

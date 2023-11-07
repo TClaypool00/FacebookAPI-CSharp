@@ -37,6 +37,13 @@ namespace FacebookAPI.App_Code.CoreModels
         {
             Construct(postGenderViewModel);
         }
+
+        public CoreGender(PostGenderViewModel postGenderViewModel, int id)
+        {
+            GenderId = id;
+
+            Construct(postGenderViewModel);
+        }
         #endregion
 
         #region Public Properties

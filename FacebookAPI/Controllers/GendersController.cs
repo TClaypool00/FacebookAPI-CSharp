@@ -55,6 +55,43 @@ namespace FacebookAPI.Controllers
                 return InternalError(ex);
             }
         }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateGenderAsync(int id, [FromBody] PostGenderViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return DisplayErrors();
+                }
+
+                if (!await _genderService.GenderExistsAsync(id))
+                {
+                    return NotFound(_genderService.GenderNotFoundMessage);
+                }
+
+                if (await _genderService.GenderNameExistsAsync(model.GenderName, id))
+                {
+                    return BadRequest(_genderService.GenderNameExistsMessage);
+                }
+
+                if (await _genderService.GenderPronounsExists(model.ProNouns, id))
+                {
+                    return BadRequest(_genderService.GenderPronounsExistsMessage);
+                }
+
+                var coreGender = new CoreGender(model, id);
+
+                coreGender = await _genderService.UpdateGenderAsync(coreGender);
+
+                return Ok(new GenderViewModel(coreGender, _genderService.GenderUpdatedOKMessage));
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
         #endregion
     }
 }

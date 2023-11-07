@@ -1,11 +1,19 @@
 ﻿using FacebookAPI.App_Code.BOL;
+using FacebookAPI.App_Code.ViewModels.PostModels;
 
 namespace FacebookAPI.App_Code.CoreModels
 {
     public class CoreGender
     {
-        private readonly Gender _gender;
+        #region Private Fields
+        private PostGenderViewModel _postGenderViewModel;
 
+        #region Read-Only fields
+        private readonly Gender _gender;
+        #endregion
+        #endregion
+
+        #region Constructors
         public CoreGender()
         {
 
@@ -25,6 +33,13 @@ namespace FacebookAPI.App_Code.CoreModels
             ProNouns = _gender.ProNouns;
         }
 
+        public CoreGender(PostGenderViewModel postGenderViewModel)
+        {
+            Construct(postGenderViewModel);
+        }
+        #endregion
+
+        #region Public Properties
         public int GenderId { get; set; }
 
         public string GenderName { get; set; }
@@ -32,5 +47,16 @@ namespace FacebookAPI.App_Code.CoreModels
         public string ProNouns { get; set; }
 
         public List<CoreProfile> Profiles { get; set; }
+        #endregion
+
+        #region Private methods
+        private void Construct(PostGenderViewModel postGenderViewModel)
+        {
+            _postGenderViewModel = postGenderViewModel ?? throw new ArgumentNullException(nameof(postGenderViewModel));
+
+            GenderName = _postGenderViewModel.GenderName;
+            ProNouns = _postGenderViewModel.ProNouns;
+        }
+        #endregion
     }
 }

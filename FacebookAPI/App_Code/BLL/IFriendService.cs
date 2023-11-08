@@ -7,7 +7,7 @@ namespace FacebookAPI.App_Code.BLL
         #region Public Methods
         public Task CreateFriendAsync(int senderId, int receiverId);
 
-        public Task DeleteFriendAsync(CoreFriend friend);
+        public Task DeleteFriendAsync(int senderId, int receiverId);
 
         public Task AcceptFriendAsync(int senderId, int receiverId);
 

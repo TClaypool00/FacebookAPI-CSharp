@@ -53,11 +53,11 @@ namespace FacebookAPI.App_Code.DAL
             }
         }
 
-        public async Task DeleteFriendAsync(CoreFriend friend)
+        public async Task DeleteFriendAsync(int senderId, int receiverId)
         {
             try
             {
-                var dataFriend = new Friend(friend);
+                var dataFriend = await FindFriendAsync(senderId, receiverId);
 
                 _context.Friends.Remove(dataFriend);
 

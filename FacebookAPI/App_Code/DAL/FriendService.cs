@@ -7,19 +7,26 @@ namespace FacebookAPI.App_Code.DAL
 {
     public class FriendService : ServiceHelper, IFriendService
     {
+        #region Constructors
         public FriendService(FacebookDbContext context, IConfiguration configuration) : base(configuration, context)
         {
 
         }
+        #endregion
 
-        public string FriendAddedMessage => "Friend Request sent.";
+        #region Public Properties
+        public string FriendAddedMessage => _configuration["Friend:AddedMessage"];
 
-        public string FriendCouldNotBeAddedMessage => "Friend Request could not be sent.";
+        public string FriendDeletedMessage => _configuration["Friend:RemovedMessage"];
 
-        public string FriendDeletedMessage => "Friend Request removed.";
+        public string FriendRequestAcceptedMessage => _configuration["Friend:AcceptedMessage"];
 
-        public string FriendRequestAcceptedMessage => "Friend Request has been accepted.";
+        public string FriendRequestExistsMessage => _configuration["Friend:ExistsMessage"];
 
+        public string FriendRequestDoesNotExistsMessage => _configuration["Friend:DoesNotExistsMessage"];
+        #endregion
+
+        #region Public Methods
         public async Task<CoreFriend> AcceptFriendAsync(CoreFriend friend)
         {
             var dataFriend = new Friend(friend)
@@ -36,7 +43,7 @@ namespace FacebookAPI.App_Code.DAL
             return friend;
         }
 
-        public async Task<CoreFriend> CreateFriendAsync(int senderId, int receiverId)
+        public async Task CreateFriendAsync(int senderId, int receiverId)
         {
             try
             {
@@ -45,8 +52,6 @@ namespace FacebookAPI.App_Code.DAL
                 await _context.Friends.AddAsync(dataFriend);
 
                 await SaveAsync();
-
-                return new CoreFriend(dataFriend);
             }
             catch (Exception)
             {
@@ -54,7 +59,7 @@ namespace FacebookAPI.App_Code.DAL
             }
         }
 
-        public async Task<bool> DeleteFriendAsync(CoreFriend friend)
+        public async Task DeleteFriendAsync(CoreFriend friend)
         {
             try
             {
@@ -63,8 +68,6 @@ namespace FacebookAPI.App_Code.DAL
                 _context.Friends.Remove(dataFriend);
 
                 await SaveAsync();
-
-                return true;
             }
             catch (Exception)
             {
@@ -72,16 +75,10 @@ namespace FacebookAPI.App_Code.DAL
             }
         }
 
-        public async Task<CoreFriend> GetFriendAsync(int senderId, int receiverId, int userId)
+        public Task<bool> FriendExistsAsync(int senderId, int receiverId)
         {
-            var friend = await FindFriendAsync(senderId, receiverId);
-
-            return new CoreFriend(friend, userId);
+            return _context.Friends.AnyAsync(f => (f.ReceiverId == receiverId && f.SenderId == senderId) || (f.ReceiverId == senderId && f.SenderId == receiverId));
         }
-
-        private Task<Friend> FindFriendAsync(int senderId, int receiverId)
-        {
-            return _context.Friends.FirstOrDefaultAsync(f => (f.SenderId == senderId && f.ReceiverId == receiverId) || (f.ReceiverId == senderId && f.SenderId == receiverId));
-        }
+        #endregion
     }
 }

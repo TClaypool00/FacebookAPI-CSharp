@@ -5,8 +5,6 @@ namespace FacebookAPI.App_Code.ViewModels
 {
     public class UserProfileViewModel : UserViewModel
     {
-        private readonly bool _isSameUser;
-
         public UserProfileViewModel()
         {
 
@@ -19,8 +17,6 @@ namespace FacebookAPI.App_Code.ViewModels
             GenderId = _coreUser.Profile.Gender.GenderId;
             ProfileId = _coreUser.Profile.ProfileId;
             MiddleName = _coreUser.Profile.MiddleName;
-            _isSameUser = _coreUser.SameUser;
-
         }
 
         public int ProfileId { get; set; }

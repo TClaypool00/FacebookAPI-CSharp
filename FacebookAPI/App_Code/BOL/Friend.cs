@@ -1,6 +1,5 @@
 ﻿using FacebookAPI.App_Code.CoreModels;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FacebookAPI.App_Code.BOL
 {

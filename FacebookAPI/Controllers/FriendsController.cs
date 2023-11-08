@@ -54,7 +54,7 @@ namespace FacebookAPI.Controllers
                     return BadRequest(_friendService.FriendRequestExistsMessage);
                 }
 
-                var coreFriend = await _friendService.CreateFriendAsync(model.SenderId, model.ReceiverId);
+                await _friendService.CreateFriendAsync(model.SenderId, model.ReceiverId);
 
                 return Ok(_friendService.FriendAddedMessage);
             }

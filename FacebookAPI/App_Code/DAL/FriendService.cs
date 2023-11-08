@@ -27,20 +27,14 @@ namespace FacebookAPI.App_Code.DAL
         #endregion
 
         #region Public Methods
-        public async Task<CoreFriend> AcceptFriendAsync(CoreFriend friend)
+        public async Task AcceptFriendAsync(int senderId, int receiverId)
         {
-            var dataFriend = new Friend(friend)
-            {
-                DateAccepted = DateTime.Now
-            };
+            var dataFriend = await FindFriendAsync(senderId, receiverId);
+            dataFriend.DateAccepted = DateTime.UtcNow;
 
             _context.Friends.Update(dataFriend);
 
             await SaveAsync();
-
-            friend.DateAccepted = dataFriend.DateAccepted;
-
-            return friend;
         }
 
         public async Task CreateFriendAsync(int senderId, int receiverId)
@@ -78,6 +72,13 @@ namespace FacebookAPI.App_Code.DAL
         public Task<bool> FriendExistsAsync(int senderId, int receiverId)
         {
             return _context.Friends.AnyAsync(f => (f.ReceiverId == receiverId && f.SenderId == senderId) || (f.ReceiverId == senderId && f.SenderId == receiverId));
+        }
+        #endregion
+
+        #region Private Methods
+        private Task<Friend> FindFriendAsync(int senderId, int receiverId)
+        {
+            return _context.Friends.FirstOrDefaultAsync(f => (f.ReceiverId == receiverId && f.SenderId == senderId) || (f.ReceiverId == senderId && f.SenderId == receiverId));
         }
         #endregion
     }

@@ -9,7 +9,7 @@ namespace FacebookAPI.App_Code.BLL
 
         public Task DeleteFriendAsync(CoreFriend friend);
 
-        public Task<CoreFriend> AcceptFriendAsync(CoreFriend friend);
+        public Task AcceptFriendAsync(int senderId, int receiverId);
 
         public Task<bool> FriendExistsAsync(int  senderId, int receiverId);
         #endregion

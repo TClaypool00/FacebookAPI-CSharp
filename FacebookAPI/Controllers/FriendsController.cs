@@ -63,6 +63,46 @@ namespace FacebookAPI.Controllers
                 return InternalError(ex);
             }
         }
+
+        [HttpPut]
+        public async Task<ActionResult> AcceptFriendAsync([FromBody] PostFriendViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return DisplayErrors();
+                }
+
+                if (!await _userService.UserExistsAsync(model.ReceiverId))
+                {
+                    return NotFound(_userService.UserDoesNotExistsMessage);
+                }
+
+                if (!await _userService.UserExistsAsync(model.SenderId))
+                {
+                    return NotFound(_userService.UserDoesNotExistsMessage);
+                }
+
+                if (!IsUserIdSame(model.ReceiverId) && !IsAdmin)
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                if (!await _friendService.FriendExistsAsync(model.SenderId, model.ReceiverId))
+                {
+                    return NotFound(_friendService.FriendRequestDoesNotExistsMessage);
+                }
+
+                await _friendService.AcceptFriendAsync(model.SenderId, model.ReceiverId);
+
+                return Ok(_friendService.FriendRequestAcceptedMessage);
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
         #endregion
     }
 }

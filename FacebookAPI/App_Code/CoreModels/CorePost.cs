@@ -9,6 +9,7 @@ namespace FacebookAPI.App_Code.CoreModels
         #region Private fields
         private Post _post;
         private PostPostViewModel _postViewModel;
+        private IConfiguration _configuration;
         #endregion
 
         #region Constructors
@@ -17,15 +18,16 @@ namespace FacebookAPI.App_Code.CoreModels
 
         }
 
-        public CorePost(PostPostViewModel model)
+        public CorePost(PostPostViewModel model, IConfiguration configuration)
         {
+            Construct(configuration);
             Construct(model);
         }
 
-        public CorePost(PostPostViewModel model, int id)
+        public CorePost(PostPostViewModel model, int id, IConfiguration configuration)
         {
-            Construct(model);
-            PostId = id;
+            Construct(model, id);
+            Construct(configuration);
         }
 
         public CorePost(Post post)
@@ -40,6 +42,8 @@ namespace FacebookAPI.App_Code.CoreModels
         public string PostBody { get; set; }
 
         public List<CoreComment> Comments { get; set; }
+
+        public List<CorePicture> Pictures { get; set; }
         #endregion
 
         #region Private methods
@@ -82,6 +86,29 @@ namespace FacebookAPI.App_Code.CoreModels
 
             UserId = _userId;
             PostBody = _postViewModel.PostBody;
+
+            if (_postViewModel.Pictures is not null && _postViewModel.Pictures.Count > 0)
+            {
+                Pictures = new List<CorePicture>();
+
+                for (int i = 0; i < _postViewModel.Pictures.Count; i++)
+                {
+                    var picture = _postViewModel.Pictures[i];
+
+                    Pictures.Add(new CorePicture(picture, _configuration, _postViewModel.Files[i]));
+                }
+            }
+        }
+
+        private void Construct(IConfiguration configuration)
+        {
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        }
+
+        private void Construct(PostPostViewModel model, int id)
+        {
+            Construct(model);
+            PostId = id;
         }
         #endregion
     }

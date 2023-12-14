@@ -5,116 +5,70 @@ namespace FacebookAPI.App_Code.CoreModels
 {
     public class CorePicture
     {
-        private readonly Picture _picture;
+        #region Private fields
+        private readonly string _fileNameWithoutExtension;
         private readonly PostPictureViewModel _postPictureViewModel;
-        private int _userId;
-        private readonly string _userPicturePath;
-        private readonly IFormFile _pictureFile;
-        private readonly string _newFileName;
+        private readonly string _fileNameExtension;
+        private readonly IFormFile _picture;
         private readonly IConfiguration _configuration;
-        private readonly string _newFilePath;
-        private readonly IWebHostEnvironment _environment;
-        private readonly string _userFolderPath;
+        #endregion
 
-        public CorePicture(PostPictureViewModel postPictureViewModel, int userId, IWebHostEnvironment environment)
+        #region Constructors
+        public CorePicture()
         {
-            _postPictureViewModel = postPictureViewModel ?? throw new ArgumentNullException(nameof(postPictureViewModel));
-            _environment = environment ?? throw new ArgumentNullException(nameof(environment));
-
-            _userId = userId;
-            _pictureFile = _postPictureViewModel.Picture;
-            _newFileName = FileRepository.NewFileName(_postPictureViewModel.Picture);
-            CaptionText = _postPictureViewModel.CaptionText;
-            _userPicturePath = FileRepository.GetUserPath(_userId, _newFileName);
-            _newFilePath = FileRepository.GetFullUserPath(_userId, _newFileName, _environment);
-            _userFolderPath = FileRepository.GetUserFolderPath(_userId, _environment);
-        }
-
-        public CorePicture(Picture picture, int userId)
-        {
-            _picture = picture ?? throw new ArgumentNullException(nameof(picture));
-            _userId= userId;
-
-            PictureId = _picture.PictureId;
-            CaptionText = _picture.CaptionText;
-
-            PictureFileName = FileRepository.GetUserPath(userId, _picture.PictureFileName);
             
         }
 
-        public CorePicture(IConfiguration configuration)
+        public CorePicture(PostPictureViewModel postPictureViewModel, IConfiguration configuration, IFormFile picture)
         {
+            _postPictureViewModel = postPictureViewModel ?? throw new ArgumentNullException(nameof(postPictureViewModel));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _picture = picture ?? throw new ArgumentNullException(nameof(picture));
 
-            PictureId = 0;
-            PictureFileName = _configuration.GetSection("app").GetSection("defaultProfilePicture").Value;
-            CaptionText = _configuration.GetSection("app").GetSection("defaultPictureText").Value;
+            UserId = _postPictureViewModel.UserId;
+            UserFolderPath = $"{_configuration.GetSection("tableNames:User").Value}{UserId}";
+            _fileNameWithoutExtension = Path.GetFileNameWithoutExtension(_picture.FileName);
+            _fileNameExtension = Path.GetExtension(_picture.FileName);
+            NewFileName = $"{_fileNameWithoutExtension}-{Guid.NewGuid()}{_fileNameExtension}";
+            FullPath = $@"{SecretConfig.DirectoryPath}\{UserFolderPath}\{NewFileName}";
+            CaptionText = _postPictureViewModel.CaptionText;
+            ProfilePicture = _postPictureViewModel.ProfilePicture;
         }
+        #endregion
 
-        public CorePicture()
-        {
-            if (string.IsNullOrEmpty(CaptionText))
-            {
-                CaptionText = "";
-            }
-        }
-
+        #region Public Properites
         public int PictureId { get; set; }
 
         public string CaptionText { get; set; }
 
-        public string PictureFileName { get; set; }
+        public string FullPath { get; set; }
 
-        public int UserId
+        public string UserFolderPath { get; set; }
+
+        public string NewFileName { get; set; }
+
+        public int UserId { get; set; }
+        public User User { get; set; }
+
+        public bool ProfilePicture { get; set; }
+
+        public int? PostId { get; set; }
+
+        public IFormFile Picture
         {
             get
             {
-                return _userId;
-            }
-            set
-            {
-                _userId = value;
+                return _picture;
             }
         }
+#nullable enable
+        public Post? Post { get; set; }
+#nullable disable
+        public int LikeCount { get; set; }
 
-        public string UserPicturePath
-        {
-            get
-            {
-                return _userPicturePath;
-            }
-        }
+        public bool Liked { get; set; }
 
-        public IFormFile PictureFile
-        {
-            get
-            {
-                return _pictureFile;
-            }
-        }
-
-        public string NewFileName
-        {
-            get
-            {
-                return _newFileName;
-            }
-        }
-
-        public string NewFilePath
-        {
-            get
-            {
-                return _newFilePath;
-            }
-        }
-
-        public string UserFolderPath
-        {
-            get
-            {
-                return _userFolderPath;
-            }
-        }
+        public List<CoreComment> Comments { get; set; }
+        #endregion
     }
 }

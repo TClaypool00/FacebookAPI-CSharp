@@ -28,10 +28,15 @@ namespace FacebookAPI.Controllers
 
         #region Route Methods
         [HttpPost]
-        public async Task<ActionResult> AddPostAsync([FromBody] PostPostViewModel model)
+        public async Task<ActionResult> AddPostAsync([FromForm] PostPostViewModel model)
         {
             try
             {
+                if (model.Files.Count != model.Pictures.Count)
+                {
+                    ModelState.AddModelError("Pictures", "Picture and file count must be the same length");
+                }
+
                 if (!ModelState.IsValid)
                 {
                     return DisplayErrors();
@@ -47,7 +52,7 @@ namespace FacebookAPI.Controllers
                     return Unauthorized(UnAuthorizedMessage);
                 }
 
-                var corePost = new CorePost(model);
+                var corePost = new CorePost(model, _configuration);
                 corePost = await _postService.AddPostAsync(corePost);
 
                 if (IsUserIdSame(model.UserId))
@@ -100,7 +105,7 @@ namespace FacebookAPI.Controllers
                     return NotFound(_userService.UserDoesNotExistsMessage);
                 }
 
-                var corePost = new CorePost(model, id);
+                var corePost = new CorePost(model, id, _configuration);
                 corePost = await _postService.UpdatePostAsync(corePost);
 
                 if (IsUserIdSame(model.UserId))

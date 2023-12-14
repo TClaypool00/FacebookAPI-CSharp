@@ -43,6 +43,34 @@ namespace FacebookAPI.App_Code.DAL
 
                 post.PostId = dataPost.PostId;
 
+                if (post.Pictures is not null && post.Pictures.Count > 0)
+                {
+                    var fileHelepr = new FileHelper(_configuration);
+
+                    for (int i = 0; i < post.Pictures.Count; i++)
+                    {
+                        var picture = post.Pictures[i];
+
+                        try
+                        {
+                            dataPost.Pictures.Add(new Picture(picture, post.PostId));
+                            await fileHelepr.AddPicture(picture);
+
+                            await _context.Pictures.AddAsync(dataPost.Pictures[i]);
+                            await SaveAsync();
+                        }
+                        catch (Exception)
+                        {
+                            fileHelepr.DeletePicture(picture);
+
+                            _context.Posts.Remove(dataPost);
+                            await SaveAsync();
+
+                            throw;
+                        }
+                    }
+                }
+
                 return post;
             }
             catch (Exception)

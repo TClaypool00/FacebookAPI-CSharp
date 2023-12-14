@@ -7,5 +7,8 @@ namespace FacebookAPI.App_Code.ViewModels.PostModels
         [Required(ErrorMessage = "Body is required")]
         [MaxLength(255, ErrorMessage = "Body has max length of 255")]
         public string PostBody { get; set; }
+
+        public List<PostPictureViewModel> Pictures { get; set; }
+        public List<IFormFile> Files { get; set; }
     }
 }

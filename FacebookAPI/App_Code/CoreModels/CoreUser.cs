@@ -157,14 +157,14 @@ namespace FacebookAPI.App_Code.CoreModels
 
             Construct(user);
 
-            if (_user.ProfilePicture is null)
-            {
-                Picture = new CorePicture(_configuration);
-            }
-            else
-            {
-                Picture = new CorePicture(_user.ProfilePicture, _userId);
-            }
+            //if (_user.ProfilePicture is null)
+            //{
+            //    Picture = new CorePicture();
+            //}
+            //else
+            //{
+            //    Picture = new CorePicture(_user.ProfilePicture, _userId);
+            //}
         }
     }
 }

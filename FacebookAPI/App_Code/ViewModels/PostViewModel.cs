@@ -34,6 +34,7 @@ namespace FacebookAPI.App_Code.ViewModels
         public int PostId { get; set; }
 
         public List<CommentViewModel> Comments { get; set; }
+        public List<string> PictureUrls { get; set; }
 
         #region Implemented methods
         public string UserDisplayName { get => _userDisplayName; set => _userDisplayName = value; }
@@ -68,6 +69,16 @@ namespace FacebookAPI.App_Code.ViewModels
                 for (int i = 0; i < _corePost.Comments.Count; i++)
                 {
                     Comments.Add(new CommentViewModel(_corePost.Comments[i]));
+                }
+            }
+
+            if (_corePost.Pictures is not null && _corePost.Pictures.Count > 0)
+            {
+                PictureUrls = new List<string>();
+
+                for (int i = 0; i < _corePost.Pictures.Count; i++)
+                {
+                    PictureUrls.Add(_corePost.Pictures[i].FullPath);
                 }
             }
 

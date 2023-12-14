@@ -7,8 +7,11 @@ namespace FacebookAPI.App_Code.BOL
     //TODO Add picture service
     public class Picture
     {
-        private readonly CorePicture _corePicture;
+        #region Private fields
+        private CorePicture _corePicture;
+        #endregion
 
+        #region Constructors
         public Picture()
         {
 
@@ -16,24 +19,17 @@ namespace FacebookAPI.App_Code.BOL
 
         public Picture(CorePicture corePicture)
         {
-            if (corePicture is null) 
-            { 
-                throw new ArgumentNullException(nameof(corePicture)); 
-            }
+            Construct(corePicture);
+        }
 
-            _corePicture = corePicture;
+        public Picture(CorePicture corePicture, int postId)
+        {
+            Construct(corePicture);
+            PostId = postId;
+        }
+        #endregion
 
-            if (_corePicture.PictureId > 0)
-            {
-                PictureId = _corePicture.PictureId;
-            }
-
-            CaptionText = _corePicture.CaptionText;
-            PictureFileName = _corePicture.NewFileName;
-            ProfilePicture = true;
-            UserId = _corePicture.UserId;
-        }       
-
+        #region Public Properties
         [Key]
         public int PictureId { get; set; }
 
@@ -52,6 +48,11 @@ namespace FacebookAPI.App_Code.BOL
         [Required]
         public bool ProfilePicture { get; set; }
 
+        public int? PostId { get; set; }
+#nullable enable
+        public Post? Post { get; set; }
+#nullable disable
+
         [NotMapped]
         public int LikeCount { get; set; }
 
@@ -60,5 +61,28 @@ namespace FacebookAPI.App_Code.BOL
 
         public List<Comment> Comments { get; set; }
         public List<Like> Likes { get; set; }
+        #endregion
+
+        #region Private Methods
+        private void Construct(CorePicture corePicture)
+        {
+            if (corePicture is null)
+            {
+                throw new ArgumentNullException(nameof(corePicture));
+            }
+
+            _corePicture = corePicture;
+
+            if (_corePicture.PictureId > 0)
+            {
+                PictureId = _corePicture.PictureId;
+            }
+
+            CaptionText = _corePicture.CaptionText;
+            PictureFileName = _corePicture.NewFileName;
+            ProfilePicture = _corePicture.ProfilePicture;
+            UserId = _corePicture.UserId;
+        }
+        #endregion
     }
 }

@@ -33,8 +33,9 @@ namespace FacebookAPI.App_Code.BOL
         public bool Liked { get; set; }
 
         public List<Comment> Comments { get; set; }
-
         public List<Like> Likes { get; set; }
+        public List<Picture> Pictures { get; set; }
+
 
         public Post()
         {
@@ -59,6 +60,11 @@ namespace FacebookAPI.App_Code.BOL
             UserId = _post.UserId;
             DatePosted = _post.DatePosted;
             DateUpdated = _post.DateUpdated;
+
+            if (_post.Pictures is not null && _post.Pictures.Count > 0)
+            {
+                Pictures = new List<Picture>();
+            }
         }
     }
 }

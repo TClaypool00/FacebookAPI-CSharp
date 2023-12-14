@@ -18,7 +18,7 @@ namespace FacebookAPI.App_Code.ViewModels.PartialModels
             UserId = _coreUser.UserId;
             FirstName = _coreUser.FirstName;
             LastName = _coreUser.LastName;
-            PicturePath = _coreUser.Picture.PictureFileName;
+            PicturePath = _coreUser.Picture.FullPath;
         }
 
         public int UserId { get; set; }

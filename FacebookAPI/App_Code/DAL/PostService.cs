@@ -288,14 +288,84 @@ namespace FacebookAPI.App_Code.DAL
 
         public async Task DeletePostAsync(int id)
         {
+            List<Reply> replies;
+            List<Like> likes;
             var dataPost = await FindPostByIdAsync(id);
 
             dataPost.Comments = await FindCommentsByPostId(id, false);
-
+            
             if (dataPost.Comments.Count > 0)
             {
+                int replyCount = await _context.Replies.CountAsync();
+
+                var dataEntity = new DataEnttiyHelper();
+                var commentIds = dataEntity.GetIds(dataPost.Comments);
+
+                likes = await _context.Likes
+                        .Where(a => commentIds.Contains((int)a.CommentId))
+                        .ToListAsync();
+
+                _context.Likes.RemoveRange(likes);
+
+                if (replyCount > 0)
+                {
+                    var ids = await _context.Replies
+                        .Where(i => commentIds.Contains(i.CommentId))
+                        .Select(l => l.ReplyId)
+                        .ToListAsync();
+
+                    likes = await _context.Likes
+                        .Where(l => ids.Contains((int)l.ReplyId))
+                        .ToListAsync();
+
+                    _context.Likes.RemoveRange(likes);
+                    await SaveAsync();
+
+                    if (replyCount > int.Parse(_configuration.GetSection("app").GetSection("TooLongValue").Value))
+                    {
+                        for (int i = 0; i < dataPost.Comments.Count; i++)
+                        {
+                            var comment = dataPost.Comments[i];
+                            replies = await _context.Replies
+                            .Where(a => a.CommentId == comment.CommentId)
+                            .ToListAsync();
+
+                            _context.Comments.Remove(comment);
+                            await SaveAsync();
+                        }
+                    }
+                    else
+                    {
+                        replies = await _context.Replies
+                        .Where(a => commentIds.Contains(a.CommentId))
+                        .ToListAsync();
+
+                        _context.Replies.RemoveRange(replies);
+                        await SaveAsync();
+                    }
+                }
+
                 _context.Comments.RemoveRange(dataPost.Comments);
 
+                await SaveAsync();
+            }
+
+            dataPost.Pictures = await _context.Pictures
+                .Where(p => p.PostId == id)
+                .ToListAsync();
+
+            if (dataPost.Pictures.Count > 0)
+            {
+                var fileHelper = new FileHelper(_configuration);
+
+                for (int i = 0; i < dataPost.Pictures.Count; i++)
+                {
+                    var picture = dataPost.Pictures[i];
+                    fileHelper.DeletePicture(picture);
+
+                }
+
+                _context.Pictures.RemoveRange(dataPost.Pictures);
                 await SaveAsync();
             }
 

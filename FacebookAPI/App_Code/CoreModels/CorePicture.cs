@@ -6,10 +6,11 @@ namespace FacebookAPI.App_Code.CoreModels
     public class CorePicture
     {
         #region Private fields
-        private readonly string _fileNameWithoutExtension;
         private readonly PostPictureViewModel _postPictureViewModel;
+        private readonly Picture _picture;
+        private readonly string _fileNameWithoutExtension;
         private readonly string _fileNameExtension;
-        private readonly IFormFile _picture;
+        private readonly IFormFile _pictureFile;
         private readonly IConfiguration _configuration;
         #endregion
 
@@ -19,20 +20,31 @@ namespace FacebookAPI.App_Code.CoreModels
             
         }
 
-        public CorePicture(PostPictureViewModel postPictureViewModel, IConfiguration configuration, IFormFile picture)
+        public CorePicture(PostPictureViewModel postPictureViewModel, IConfiguration configuration, IFormFile pictureFile)
         {
             _postPictureViewModel = postPictureViewModel ?? throw new ArgumentNullException(nameof(postPictureViewModel));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _picture = picture ?? throw new ArgumentNullException(nameof(picture));
+            _pictureFile = pictureFile ?? throw new ArgumentNullException(nameof(pictureFile));
 
             UserId = _postPictureViewModel.UserId;
-            UserFolderPath = $"{_configuration.GetSection("tableNames:User").Value}{UserId}";
-            _fileNameWithoutExtension = Path.GetFileNameWithoutExtension(_picture.FileName);
-            _fileNameExtension = Path.GetExtension(_picture.FileName);
+            _fileNameWithoutExtension = Path.GetFileNameWithoutExtension(_pictureFile.FileName);
+            _fileNameExtension = Path.GetExtension(_pictureFile.FileName);
             NewFileName = $"{_fileNameWithoutExtension}-{Guid.NewGuid()}{_fileNameExtension}";
-            FullPath = $@"{SecretConfig.DirectoryPath}\{UserFolderPath}\{NewFileName}";
+
+            SetPictureProperties();
+            
             CaptionText = _postPictureViewModel.CaptionText;
             ProfilePicture = _postPictureViewModel.ProfilePicture;
+        }
+
+        public CorePicture(Picture picture, IConfiguration configuration)
+        {
+            _picture = picture ?? throw new ArgumentNullException(nameof(picture));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            NewFileName = _picture.PictureFileName;
+            UserId = _picture.UserId;
+
+            SetPictureProperties();
         }
         #endregion
 
@@ -58,7 +70,7 @@ namespace FacebookAPI.App_Code.CoreModels
         {
             get
             {
-                return _picture;
+                return _pictureFile;
             }
         }
 #nullable enable
@@ -69,6 +81,14 @@ namespace FacebookAPI.App_Code.CoreModels
         public bool Liked { get; set; }
 
         public List<CoreComment> Comments { get; set; }
+        #endregion
+
+        #region Private Methods
+        private void SetPictureProperties()
+        {
+            UserFolderPath = $"{_configuration.GetSection("tableNames:User").Value}{UserId}";
+            FullPath = $@"{SecretConfig.DirectoryPath}\{UserFolderPath}\{NewFileName}";
+        }
         #endregion
     }
 }

@@ -32,6 +32,9 @@ namespace FacebookAPI.App_Code.BOL
         [NotMapped]
         public bool Liked { get; set; }
 
+        [NotMapped]
+        public Picture Picture { get; set; }
+
         public List<Comment> Comments { get; set; }
         public List<Like> Likes { get; set; }
         public List<Picture> Pictures { get; set; }

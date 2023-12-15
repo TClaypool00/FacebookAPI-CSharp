@@ -30,9 +30,9 @@ namespace FacebookAPI.App_Code.CoreModels
             Construct(configuration);
         }
 
-        public CorePost(Post post)
+        public CorePost(Post post, IConfiguration configuration)
         {
-            Construct(post);
+            Construct(post, configuration);
         }
         #endregion
 
@@ -41,15 +41,18 @@ namespace FacebookAPI.App_Code.CoreModels
 
         public string PostBody { get; set; }
 
+        public CorePicture Picture { get; set; }
+
         public List<CoreComment> Comments { get; set; }
 
         public List<CorePicture> Pictures { get; set; }
         #endregion
 
         #region Private methods
-        private void Construct(Post post)
+        private void Construct(Post post, IConfiguration configuration)
         {
             _post = post ?? throw new ArgumentNullException(nameof(post));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
             PostId = _post.PostId;
             PostBody = _post.PostBody;
@@ -64,13 +67,18 @@ namespace FacebookAPI.App_Code.CoreModels
 
                 for (int i = 0; i < _post.Comments.Count; i++)
                 {
-                    Comments.Add(new CoreComment(_post.Comments[i]));
+                    Comments.Add(new CoreComment(_post.Comments[i], _configuration));
                 }
             }
 
             if (_post.User is not null)
             {
                 User = new CoreUser(_post.User);
+            }
+
+            if (_post.Picture is not null)
+            {
+                Picture = new CorePicture(_post.Picture, _configuration);
             }
         }
 

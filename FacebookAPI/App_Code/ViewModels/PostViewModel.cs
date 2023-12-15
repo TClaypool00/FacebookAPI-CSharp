@@ -81,6 +81,13 @@ namespace FacebookAPI.App_Code.ViewModels
                     PictureUrls.Add(_corePost.Pictures[i].FullPath);
                 }
             }
+            else if (_corePost.Picture is not null)
+            {
+                PictureUrls = new List<string>
+                {
+                    _corePost.Picture.FullPath
+                };
+            }
 
             if (_corePost.User is not null)
             {

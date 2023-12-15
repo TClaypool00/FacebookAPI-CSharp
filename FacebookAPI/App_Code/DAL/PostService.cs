@@ -112,10 +112,17 @@ namespace FacebookAPI.App_Code.DAL
                             LastName = p.User.LastName
                         },
                         LikeCount = p.Likes.Count(a => a.PostId == p.PostId),
-                        Liked = p.Likes.Any(a => a.UserId == userId && a.PostId == p.PostId)
+                        Liked = p.Likes.Any(a => a.UserId == userId && a.PostId == p.PostId),
+                        Picture = p.Pictures.Select(b => new Picture
+                        {
+                            PictureFileName = b.PictureFileName,
+                            UserId = userId,
+                            
+                        })
+                        .FirstOrDefault()
                     })
-                    .Take(_takeValue)
                     .Skip(_index)
+                    .Take(_takeValue)
                     .ToListAsync();
 
             if (posts is not null && posts.Count > 0)
@@ -172,7 +179,7 @@ namespace FacebookAPI.App_Code.DAL
                         }
                     }
 
-                    corPosts.Add(new CorePost(posts[i]));
+                    corPosts.Add(new CorePost(posts[i], _configuration));
                 }
             }
 
@@ -204,6 +211,12 @@ namespace FacebookAPI.App_Code.DAL
                     PostBody = c.PostBody,
                     LikeCount = c.Likes.Count(l => l.PostId == c.PostId),
                     Liked = c.Likes.Any(l => l.UserId == userId && l.PostId == c.PostId),
+                    Picture = c.Pictures.Select(b => new Picture
+                    {
+                        PictureFileName = b.PictureFileName,
+                        UserId = userId
+                    })
+                    .FirstOrDefault(),
                     User = new User
                     {
                         UserId = c.User.UserId,
@@ -224,7 +237,7 @@ namespace FacebookAPI.App_Code.DAL
 
                 post.Comments = comments.Where(a => a.PostId == post.PostId).ToList();
 
-                corePosts.Add(new CorePost(posts[i]));
+                corePosts.Add(new CorePost(posts[i], _configuration));
             }
 
             return corePosts;
@@ -270,7 +283,7 @@ namespace FacebookAPI.App_Code.DAL
                 dataPost.Comments = await FindCommentsByPostId(id);
             }
 
-            return new CorePost(dataPost);
+            return new CorePost(dataPost, _configuration);
         }
 
         public async Task DeletePostAsync(int id)
@@ -333,27 +346,6 @@ namespace FacebookAPI.App_Code.DAL
             return userIds;
         }
 
-        private Task<List<Comment>> FindComments(List<int> ids)
-        {
-            return _context.Comments
-                .Where(c => ids.Contains((int)c.PostId))
-                .Select(c => new Comment
-                {
-                    CommentId = c.CommentId,
-                    CommentBody = c.CommentBody,
-                    DatePosted = c.DatePosted,
-                    PostId = c.PostId,
-                    User = new User
-                    {
-                        UserId = c.User.UserId,
-                        FirstName = c.User.FirstName,
-                        LastName = c.User.LastName
-                    }
-                })
-                .Take(_takeValue)
-                .ToListAsync();
-        }
-
         private Task<Post> FindPostByIdAsync(int id)
         {
             return _context.Posts.FirstOrDefaultAsync(p => p.PostId == id);
@@ -368,6 +360,12 @@ namespace FacebookAPI.App_Code.DAL
                 DatePosted = p.DatePosted,
                 LikeCount = p.Likes.Count(l => l.PostId == p.PostId),
                 Liked = p.Likes.Any(a => a.PostId == p.PostId && a.UserId == userId),
+                Picture = p.Pictures.Select(b => new Picture
+                {
+                    PictureFileName = b.PictureFileName,
+                    UserId = userId
+                })
+                .FirstOrDefault(),
                 User = new User
                 {
                     UserId = p.User.UserId,
@@ -406,6 +404,27 @@ namespace FacebookAPI.App_Code.DAL
                     .Where(c => c.PostId == id)
                     .ToListAsync();
             }
+        }
+
+        private Task<List<Comment>> FindComments(List<int> ids)
+        {
+            return _context.Comments
+                .Where(c => ids.Contains((int)c.PostId))
+                .Select(c => new Comment
+                {
+                    CommentId = c.CommentId,
+                    CommentBody = c.CommentBody,
+                    DatePosted = c.DatePosted,
+                    PostId = c.PostId,
+                    User = new User
+                    {
+                        UserId = c.User.UserId,
+                        FirstName = c.User.FirstName,
+                        LastName = c.User.LastName
+                    }
+                })
+                .Take(_takeValue)
+                .ToListAsync();
         }
         #endregion
     }

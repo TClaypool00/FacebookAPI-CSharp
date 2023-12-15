@@ -98,7 +98,7 @@ namespace FacebookAPI.Controllers
                     return NotFound(_commentService.CommentNotFoundMessage);
                 }
 
-                var coreReply = new CoreReply(model, id);
+                var coreReply = new CoreReply(model, id, _configuration);
                 coreReply = await _replyService.UpdateReplyAsync(coreReply);
 
                 if (IsUserIdSame(model.UserId))

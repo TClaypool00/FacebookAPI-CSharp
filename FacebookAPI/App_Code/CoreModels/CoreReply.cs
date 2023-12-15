@@ -9,6 +9,7 @@ namespace FacebookAPI.App_Code.CoreModels
         #region Private fields
         private PostReplyViewModel _postReplyViewModel;
         private readonly Reply _reply;
+        private readonly IConfiguration _configuration;
         #endregion
 
         #region Constructors
@@ -22,10 +23,12 @@ namespace FacebookAPI.App_Code.CoreModels
             Construct(postReplyViewModel);
         }
 
-        public CoreReply(PostReplyViewModel postReplyViewModel, int id)
+        public CoreReply(PostReplyViewModel postReplyViewModel, int id, IConfiguration configuration)
         {
             Construct(postReplyViewModel);
             ReplyId = id;
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+
         }
 
         public CoreReply(Reply reply)
@@ -42,7 +45,7 @@ namespace FacebookAPI.App_Code.CoreModels
 
             if (_reply.Comment is not null)
             {
-                Comment = new CoreComment(_reply.Comment);
+                Comment = new CoreComment(_reply.Comment, _configuration);
             }
 
             if (_reply.User is not null)

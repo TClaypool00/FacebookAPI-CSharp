@@ -105,17 +105,14 @@ namespace FacebookAPI.App_Code.DAL
                 .ToListAsync();
             }
 
-            return new CoreComment(comment);
+            return new CoreComment(comment, _configuration);
         }
 
         public async Task<List<CoreComment>> GetCommentsAsync(int currentUserId, int? userId = null, int? index = null, int? postId = null, bool? includeReplies = null)
         {
             ConfigureIndex(index);
 
-            if (userId is null)
-            {
-                userId = currentUserId;
-            }
+            userId ??= currentUserId;
 
             var coreComments = new List<CoreComment>();
             List<Comment> comments = null;
@@ -211,7 +208,7 @@ namespace FacebookAPI.App_Code.DAL
                     {
                         comment.Replies = replies.Where(a => a.CommentId == comment.CommentId).ToList();
                     }
-                    coreComments.Add(new CoreComment(comment));
+                    coreComments.Add(new CoreComment(comment, _configuration));
                 }
             }
 

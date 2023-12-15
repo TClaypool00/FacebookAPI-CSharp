@@ -11,6 +11,7 @@ namespace FacebookAPI.App_Code.CoreModels
 
         #region Read-Only
         private readonly Comment _comment;
+        private readonly IConfiguration _configuration;
         #endregion
         #endregion
 
@@ -21,14 +22,11 @@ namespace FacebookAPI.App_Code.CoreModels
 
         }
 
-        public CoreComment(Comment comment)
+        public CoreComment(Comment comment, IConfiguration configuration)
         {
-            if (comment is null)
-            {
-                throw new ArgumentNullException(nameof(comment));
-            }
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
-            _comment = comment;
+            _comment = comment ?? throw new ArgumentNullException(nameof(comment));
 
             CommentId = _comment.CommentId;
             CommentBody = _comment.CommentBody;
@@ -46,7 +44,7 @@ namespace FacebookAPI.App_Code.CoreModels
 
             if (_comment.Post is not null)
             {
-                Post = new CorePost(_comment.Post);
+                Post = new CorePost(_comment.Post, _configuration);
             }
 
             if (_comment.Replies is not null && _comment.Replies.Count > 0)
@@ -58,6 +56,7 @@ namespace FacebookAPI.App_Code.CoreModels
                     Replies.Add(new CoreReply(_comment.Replies[i]));
                 }
             }
+            _configuration = configuration;
         }
 
         public CoreComment(PostCommentViewModel postComentModel)

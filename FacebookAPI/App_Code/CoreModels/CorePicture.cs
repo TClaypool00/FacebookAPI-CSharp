@@ -8,10 +8,11 @@ namespace FacebookAPI.App_Code.CoreModels
         #region Private fields
         private readonly PostPictureViewModel _postPictureViewModel;
         private readonly Picture _picture;
-        private readonly string _fileNameWithoutExtension;
-        private readonly string _fileNameExtension;
-        private readonly IFormFile _pictureFile;
-        private readonly IConfiguration _configuration;
+        private readonly SinglePostPictureViewModel _singlePostPictureViewModel;
+        private string _fileNameWithoutExtension;
+        private string _fileNameExtension;
+        private IFormFile _pictureFile;
+        private IConfiguration _configuration;
         #endregion
 
         #region Constructors
@@ -23,18 +24,24 @@ namespace FacebookAPI.App_Code.CoreModels
         public CorePicture(PostPictureViewModel postPictureViewModel, IConfiguration configuration, IFormFile pictureFile)
         {
             _postPictureViewModel = postPictureViewModel ?? throw new ArgumentNullException(nameof(postPictureViewModel));
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            _pictureFile = pictureFile ?? throw new ArgumentNullException(nameof(pictureFile));
 
-            UserId = _postPictureViewModel.UserId;
-            _fileNameWithoutExtension = Path.GetFileNameWithoutExtension(_pictureFile.FileName);
-            _fileNameExtension = Path.GetExtension(_pictureFile.FileName);
-            NewFileName = $"{_fileNameWithoutExtension}-{Guid.NewGuid()}{_fileNameExtension}";
+            Construct(configuration, pictureFile);
 
-            SetPictureProperties();
-            
             CaptionText = _postPictureViewModel.CaptionText;
             ProfilePicture = _postPictureViewModel.ProfilePicture;
+            PostId = _postPictureViewModel.PostId;
+        }
+
+        public CorePicture(SinglePostPictureViewModel singlePostPictureViewModel, IConfiguration configuration, IFormFile pictureFile)
+        {
+            _singlePostPictureViewModel = singlePostPictureViewModel ?? throw new ArgumentNullException(nameof(singlePostPictureViewModel));
+
+            Construct(configuration, pictureFile);
+
+            CaptionText = _singlePostPictureViewModel.CaptionText;
+            ProfilePicture = _singlePostPictureViewModel.ProfilePicture;
+            PostId = _singlePostPictureViewModel.PostId;
+
         }
 
         public CorePicture(Picture picture, IConfiguration configuration)
@@ -43,6 +50,7 @@ namespace FacebookAPI.App_Code.CoreModels
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             NewFileName = _picture.PictureFileName;
             UserId = _picture.UserId;
+            PostId = _picture.PostId;
 
             SetPictureProperties();
         }
@@ -60,7 +68,7 @@ namespace FacebookAPI.App_Code.CoreModels
         public string NewFileName { get; set; }
 
         public int UserId { get; set; }
-        public User User { get; set; }
+        public CoreUser User { get; set; }
 
         public bool ProfilePicture { get; set; }
 
@@ -88,6 +96,20 @@ namespace FacebookAPI.App_Code.CoreModels
         {
             UserFolderPath = $"{_configuration.GetSection("tableNames:User").Value}{UserId}";
             FullPath = $@"{SecretConfig.DirectoryPath}\{UserFolderPath}\{NewFileName}";
+        }
+
+        private void Construct(IConfiguration configuration, IFormFile formFile)
+        {
+            
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _pictureFile = formFile ?? throw new ArgumentNullException(nameof(formFile));
+
+            UserId = _postPictureViewModel.UserId;
+            _fileNameWithoutExtension = Path.GetFileNameWithoutExtension(_pictureFile.FileName);
+            _fileNameExtension = Path.GetExtension(_pictureFile.FileName);
+            NewFileName = $"{_fileNameWithoutExtension}-{Guid.NewGuid()}{_fileNameExtension}";
+
+            SetPictureProperties();
         }
         #endregion
     }

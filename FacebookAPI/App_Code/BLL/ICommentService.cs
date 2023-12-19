@@ -5,7 +5,7 @@ namespace FacebookAPI.App_Code.BLL
     public interface ICommentService
     {
         #region Public Properties
-        public Task<List<CoreComment>> GetCommentsAsync(int currentUserId, int? userId = null, int? index = null, int? postId = null, bool? includeReplies = null);
+2        public Task<List<CoreComment>> GetCommentsAsync(int currentUserId, int? userId = null, int? index = null, int? postId = null, bool? includeReplies = null, int? pictureId = null);
 
         public Task<CoreComment> AddCommentAsync(CoreComment comment);
 

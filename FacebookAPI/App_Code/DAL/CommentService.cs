@@ -108,11 +108,11 @@ namespace FacebookAPI.App_Code.DAL
             return new CoreComment(comment, _configuration);
         }
 
-        public async Task<List<CoreComment>> GetCommentsAsync(int currentUserId, int? userId = null, int? index = null, int? postId = null, bool? includeReplies = null)
+E        public async Task<List<CoreComment>> GetCommentsAsync(int currentUserId, int? userId = null, int? index = null, int? postId = null, bool? includeReplies = null, int? pictureId = null)
         {
             ConfigureIndex(index);
 
-            userId ??= currentUserId;
+            //userId ??= currentUserId;
 
             var coreComments = new List<CoreComment>();
             List<Comment> comments = null;
@@ -169,6 +169,36 @@ namespace FacebookAPI.App_Code.DAL
                 else
                 {
                     comments = comments.Where(u => u.UserId == userId).ToList();
+                }
+            }
+
+            if (pictureId is not null)
+            {
+                if (comments is null)
+                {
+                    comments = await _context.Comments
+                    .Where(u => u.PictureId == pictureId)
+                    .Select(c => new Comment
+                    {
+                        CommentId = c.CommentId,
+                        CommentBody = c.CommentBody,
+                        DatePosted = c.DatePosted,
+                        DateUpdated = c.DateUpdated,
+                        PostId = postId,
+                        User = new User
+                        {
+                            UserId = c.User.UserId,
+                            FirstName = c.User.FirstName,
+                            LastName = c.User.LastName,
+                        }
+                    })
+                    .Take(_takeValue)
+                    .Skip(_index)
+                    .ToListAsync();
+                }
+                else
+                {
+                    comments = comments.Where(a => a.PictureId == pictureId).ToList();
                 }
             }
 

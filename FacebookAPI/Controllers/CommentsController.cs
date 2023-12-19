@@ -16,14 +16,16 @@ namespace FacebookAPI.Controllers
         private readonly ICommentService _commentService;
         private readonly IUserService _userService;
         private readonly IPostService _postService;
+        private readonly IPictureService _pictureService;
         #endregion
 
         #region Constructors
-        public CommentsController(IConfiguration configuration, ICommentService commentService, IUserService userService, IPostService postService) : base(configuration)
+        public CommentsController(IConfiguration configuration, ICommentService commentService, IUserService userService, IPostService postService, IPictureService pictureService) : base(configuration)
         {
             _commentService = commentService;
             _userService = userService;
             _postService = postService;
+            _pictureService = pictureService;
         }
         #endregion
 
@@ -38,6 +40,11 @@ namespace FacebookAPI.Controllers
                     return DisplayErrors();
                 }
 
+                if (AllParametersNull(model.PostId, model.PictureId))
+                {
+                    return BadRequest(_configuration["Comment:PostCommentError"]);
+                }
+
                 if (!IsAdmin && !IsUserIdSame(model.UserId))
                 {
                     return Unauthorized(UnAuthorizedMessage);
@@ -48,9 +55,20 @@ namespace FacebookAPI.Controllers
                     return NotFound(_userService.UserDoesNotExistsMessage);
                 }
 
-                if (!await _postService.PostExistsAsync(model.PostId))
+                if (model.PostId is not null)
                 {
-                    return NotFound(_postService.PostDoesNotExistMessage);
+                    if (!await _postService.PostExistsAsync((int)model.PostId))
+                    {
+                        return NotFound(_postService.PostDoesNotExistMessage);
+                    }
+                }
+
+                if (model.PictureId is not null)
+                {
+                    if (! await _pictureService.PictureExistsAsync((int)model.PictureId))
+                    {
+                        return NotFound(_pictureService.PictureDoesNotExistMessage);
+                    }
                 }
 
                 var coreComment = new CoreComment(model);
@@ -84,6 +102,11 @@ namespace FacebookAPI.Controllers
                     return DisplayErrors();
                 }
 
+                if (AllParametersNull(model.PostId, model.PictureId))
+                {
+                    return BadRequest(_configuration["Comment:PostCommentError"]);
+                }
+
                 if (!await _commentService.CommentExistsAsync(id))
                 {
                     return NotFound(_commentService.CommentNotFoundMessage);
@@ -99,9 +122,20 @@ namespace FacebookAPI.Controllers
                     return NotFound(_userService.UserDoesNotExistsMessage);
                 }
 
-                if (!await _postService.PostExistsAsync(model.PostId))
+                if (model.PostId is not null)
                 {
-                    return NotFound(_postService.PostDoesNotExistMessage);
+                    if (!await _postService.PostExistsAsync((int)model.PostId))
+                    {
+                        return NotFound(_postService.PostDoesNotExistMessage);
+                    }
+                }
+
+                if (model.PictureId is not null)
+                {
+                    if (!await _pictureService.PictureExistsAsync((int)model.PictureId))
+                    {
+                        return NotFound(_pictureService.PictureDoesNotExistMessage);
+                    }
                 }
 
                 var coreComment = new CoreComment(model, id);
@@ -152,11 +186,11 @@ namespace FacebookAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetCommentsAsync([FromQuery] int? userId = null, int? index = null, int? postId = null, bool? includeReplies = null)
+        public async Task<ActionResult> GetCommentsAsync([FromQuery] int? userId = null, int? index = null, int? postId = null, bool? includeReplies = null, int? pictureId = null)
         {
             try
             {
-                if (AllParametersNull(userId, postId))
+                if (AllParametersNull(userId, postId, pictureId))
                 {
                     return BadRequest(AllParametersNullMessage);
                 }
@@ -166,7 +200,7 @@ namespace FacebookAPI.Controllers
                     return Unauthorized(UnAuthorizedMessage);
                 }
 
-                var coreComments = await _commentService.GetCommentsAsync(UserId, userId, index, postId, includeReplies);
+                var coreComments = await _commentService.GetCommentsAsync(UserId, userId, index, postId, includeReplies, pictureId);
 
                 if (coreComments.Count == 0)
                 {

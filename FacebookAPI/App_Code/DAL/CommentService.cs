@@ -108,7 +108,7 @@ namespace FacebookAPI.App_Code.DAL
             return new CoreComment(comment, _configuration);
         }
 
-E        public async Task<List<CoreComment>> GetCommentsAsync(int currentUserId, int? userId = null, int? index = null, int? postId = null, bool? includeReplies = null, int? pictureId = null)
+        public async Task<List<CoreComment>> GetCommentsAsync(int currentUserId, int? userId = null, int? index = null, int? postId = null, bool? includeReplies = null, int? pictureId = null)
         {
             ConfigureIndex(index);
 

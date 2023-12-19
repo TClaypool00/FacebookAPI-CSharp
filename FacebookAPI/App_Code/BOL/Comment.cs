@@ -66,6 +66,7 @@ namespace FacebookAPI.App_Code.BOL
             DatePosted = _comment.DatePosted;
             DateUpdated = _comment.DateUpdated;
             PostId = _comment.PostId;
+            PictureId = _comment.PictureId;
             UserId = _comment.UserId;
         }
     }

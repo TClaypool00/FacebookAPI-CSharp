@@ -84,5 +84,57 @@ namespace FacebookAPI.Controllers
                 return InternalError(ex);
             }
         }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdatePictureAsync(int id, [FromBody] SinglePostPictureViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return DisplayErrors();
+                }
+
+                if (!await _pictureService.PictureExistsAsync(id))
+                {
+                    return NotFound(_pictureService.PictureDoesNotExistMessage);
+                }
+
+                var corePicture = await _pictureService.GetPictureByIdAsync(id, UserId);
+
+                if (!IsAdmin)
+                {
+                    if (corePicture.UserId !=  model.UserId || corePicture.PostId != model.PostId)
+                    {
+                        return Unauthorized(UnAuthorizedMessage);
+                    }
+                }
+
+                if (corePicture.ProfilePicture == false && model.ProfilePicture == true)
+                {
+                    await _pictureService.UpdateProfilePictureAsync(id, model.ProfilePicture);
+                }
+
+                var updatedCorePicture = new CorePicture(model, id);
+
+                updatedCorePicture = await _pictureService.UpdatePictureByIdAsync(updatedCorePicture);
+
+                if (IsUserIdSame(model.UserId))
+                {
+                    updatedCorePicture.User = new CoreUser(UserId, FirstName, LastName);
+                }
+                else
+                {
+                    updatedCorePicture.User = await _userService.GetFullNameAsync(model.UserId);
+                }
+
+                return Ok(new PictrueViewModel(updatedCorePicture));
+
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
     }
 }

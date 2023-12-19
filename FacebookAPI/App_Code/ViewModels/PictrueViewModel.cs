@@ -27,6 +27,7 @@ namespace FacebookAPI.App_Code.ViewModels
             LikeCount = _corePicture.LikeCount;
             Liked = _corePicture.Liked;
             PostId = _corePicture.PostId;
+            ProfilePicture = _corePicture.ProfilePicture;
             
             if (_corePicture.Comments is not null && _corePicture.Comments.Count > 0)
             {
@@ -56,6 +57,8 @@ namespace FacebookAPI.App_Code.ViewModels
         public int LikeCount { get; set; }
 
         public bool Liked { get; set; }
+
+        public bool ProfilePicture { get; set; }
 
         public List<CommentViewModel> Comments { get; set; }
         #endregion

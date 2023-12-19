@@ -1,5 +1,6 @@
 ﻿using FacebookAPI.App_Code.BOL;
 using FacebookAPI.App_Code.ViewModels.PostModels;
+using Microsoft.Extensions.Configuration;
 
 namespace FacebookAPI.App_Code.CoreModels
 {
@@ -26,6 +27,8 @@ namespace FacebookAPI.App_Code.CoreModels
         {
             _postPictureViewModel = postPictureViewModel ?? throw new ArgumentNullException(nameof(postPictureViewModel));
 
+            UserId = _postPictureViewModel.UserId;
+
             Construct(configuration, pictureFile);
 
             CaptionText = _postPictureViewModel.CaptionText;
@@ -37,12 +40,26 @@ namespace FacebookAPI.App_Code.CoreModels
         {
             _singlePostPictureViewModel = singlePostPictureViewModel ?? throw new ArgumentNullException(nameof(singlePostPictureViewModel));
 
+            UserId = _singlePostPictureViewModel.UserId;
+
             Construct(configuration, pictureFile);
 
             CaptionText = _singlePostPictureViewModel.CaptionText;
             ProfilePicture = _singlePostPictureViewModel.ProfilePicture;
             PostId = _singlePostPictureViewModel.PostId;
 
+        }
+
+        public CorePicture(SinglePostPictureViewModel singlePostPictureViewModel, int id)
+        {
+            _singlePostPictureViewModel = singlePostPictureViewModel ?? throw new ArgumentNullException(nameof(singlePostPictureViewModel));
+
+            UserId = _singlePostPictureViewModel.UserId;
+
+            PictureId = id;
+
+            CaptionText = _singlePostPictureViewModel.CaptionText;
+            ProfilePicture = _singlePostPictureViewModel.ProfilePicture;
         }
 
         public CorePicture(Picture picture, IConfiguration configuration)
@@ -116,9 +133,13 @@ namespace FacebookAPI.App_Code.CoreModels
         #region Private Methods
         private void SetPictureProperties()
         {
-            if (UserId == 0)
+            if (UserId == 0 && _picture.User is not null)
             {
                 UserId = _picture.User.UserId;
+            }
+            else if (_picture.UserId > 0)
+            {
+                UserId = _picture.UserId;
             }
 
             UserFolderPath = $"{_configuration.GetSection("tableNames:User").Value}{UserId}";
@@ -131,7 +152,6 @@ namespace FacebookAPI.App_Code.CoreModels
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _pictureFile = formFile ?? throw new ArgumentNullException(nameof(formFile));
 
-            UserId = _postPictureViewModel.UserId;
             _fileNameWithoutExtension = Path.GetFileNameWithoutExtension(_pictureFile.FileName);
             _fileNameExtension = Path.GetExtension(_pictureFile.FileName);
             NewFileName = $"{_fileNameWithoutExtension}-{Guid.NewGuid()}{_fileNameExtension}";

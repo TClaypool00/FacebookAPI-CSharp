@@ -9,9 +9,13 @@ namespace FacebookAPI.App_Code.BLL
 
         public Task<CorePicture> GetPictureByIdAsync(int id, int userId);
 
+        public Task<CorePicture> UpdatePictureByIdAsync(CorePicture picture);
+
         public Task<List<int>> AddPicturesAsync(List<CorePicture> pictures);
 
         public Task<bool> PictureExistsAsync(int id);
+
+        public Task UpdateProfilePictureAsync(int id, bool profilePicture);
 
         public string PicturesCouldNotBeAddedMessage(List<int> ids);
         #endregion
@@ -24,6 +28,8 @@ namespace FacebookAPI.App_Code.BLL
         public string PicturesAddedOKMessage { get; }
 
         public string PictureDoesNotExistMessage { get; }
+
+        public string PictureUpdatedOKMessage { get; }
         #endregion
     }
 }

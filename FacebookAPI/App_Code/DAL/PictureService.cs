@@ -28,6 +28,8 @@ namespace FacebookAPI.App_Code.DAL
         public string PicturesAddedOKMessage => $"{_multiTableName} {_addedOKMessage}";
 
         public string PictureDoesNotExistMessage => $"{_tableName} {_doesNotExistMessage}";
+
+        public string PictureUpdatedOKMessage => $"{_tableName} {_updatedOKMessage}";
         #endregion
 
         #region Public Methods
@@ -139,6 +141,35 @@ namespace FacebookAPI.App_Code.DAL
             output += _couldNotAddedMessage;
 
             return output;
+        }
+
+        public async Task<CorePicture> UpdatePictureByIdAsync(CorePicture picture)
+        {
+            var dataPicture = await FindPictureById(picture.PictureId);
+            dataPicture.ProfilePicture = picture.ProfilePicture;
+            dataPicture.UserId = picture.UserId;
+            dataPicture.PostId = picture.PostId;
+            dataPicture.CaptionText = picture.CaptionText;
+
+            await SaveAsync();
+
+            return new CorePicture(dataPicture, _configuration);
+        }
+
+        public async Task UpdateProfilePictureAsync(int id, bool profilePicture)
+        {
+            var picture = await FindPictureById(id);
+            picture.ProfilePicture = profilePicture;
+
+
+            await SaveAsync();
+        }
+        #endregion
+
+        #region Private Methods
+        private Task<Picture> FindPictureById(int id)
+        {
+            return _context.Pictures.FirstOrDefaultAsync(p => p.PictureId == id);
         }
         #endregion
     }

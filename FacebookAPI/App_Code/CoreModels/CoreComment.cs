@@ -77,8 +77,11 @@ namespace FacebookAPI.App_Code.CoreModels
 
         public string CommentBody { get; set; }
 
-        public int PostId { get; set; }
+        public int? PostId { get; set; }
         public CorePost Post { get; set; }
+
+        public int? PictureId { get; set; }
+        public CorePicture Picture { get; set; }
 
         public List<CoreReply> Replies { get; set; }
         #endregion
@@ -90,6 +93,7 @@ namespace FacebookAPI.App_Code.CoreModels
 
             CommentBody = _postComentModel.CommentBody;
             PostId = _postComentModel.PostId;
+            PictureId = _postComentModel.PictureId;
             _userId = _postComentModel.UserId;
         }
         #endregion

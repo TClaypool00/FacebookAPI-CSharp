@@ -51,6 +51,7 @@ namespace FacebookAPI.App_Code.ViewModels
             UserId = _coreComment.UserId;            
             DatePosted = _coreComment.DatePostedString;
             PostId = _coreComment.PostId;
+            PictureId = _coreComment.PictureId;
 
             if (_coreComment.User is not null)
             {

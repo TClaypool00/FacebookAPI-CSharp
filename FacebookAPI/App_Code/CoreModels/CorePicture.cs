@@ -13,6 +13,7 @@ namespace FacebookAPI.App_Code.CoreModels
         private string _fileNameExtension;
         private IFormFile _pictureFile;
         private IConfiguration _configuration;
+        private int _userId;
         #endregion
 
         #region Constructors
@@ -49,8 +50,19 @@ namespace FacebookAPI.App_Code.CoreModels
             _picture = picture ?? throw new ArgumentNullException(nameof(picture));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             NewFileName = _picture.PictureFileName;
-            UserId = _picture.UserId;
+
+            PictureId = _picture.PictureId;
+            
+            if (_picture.User is not null)
+            {
+                User = new CoreUser(_picture.User);
+            }
+
             PostId = _picture.PostId;
+            CaptionText = _picture.CaptionText;
+            ProfilePicture = _picture.ProfilePicture;
+            PostId = _picture.PostId;
+            
 
             SetPictureProperties();
         }
@@ -67,7 +79,17 @@ namespace FacebookAPI.App_Code.CoreModels
 
         public string NewFileName { get; set; }
 
-        public int UserId { get; set; }
+        public int UserId
+        {
+            get
+            {
+                return _userId;
+            }
+            set
+            {
+                _userId = value;
+            }
+        }
         public CoreUser User { get; set; }
 
         public bool ProfilePicture { get; set; }
@@ -94,6 +116,11 @@ namespace FacebookAPI.App_Code.CoreModels
         #region Private Methods
         private void SetPictureProperties()
         {
+            if (UserId == 0)
+            {
+                UserId = _picture.User.UserId;
+            }
+
             UserFolderPath = $"{_configuration.GetSection("tableNames:User").Value}{UserId}";
             FullPath = $@"{SecretConfig.DirectoryPath}\{UserFolderPath}\{NewFileName}";
         }

@@ -26,6 +26,8 @@ namespace FacebookAPI.App_Code.DAL
         public string PictureCouldNotBeAddedMessage => $"{_tableName} {_couldNotAddedMessage}";
 
         public string PicturesAddedOKMessage => $"{_multiTableName} {_addedOKMessage}";
+
+        public string PictureDoesNotExistMessage => $"{_tableName} {_doesNotExistMessage}";
         #endregion
 
         #region Public Methods
@@ -87,6 +89,35 @@ namespace FacebookAPI.App_Code.DAL
             }
 
             return ids;
+        }
+
+        public async Task<CorePicture> GetPictureByIdAsync(int id, int userId)
+        {
+            var picture = await _context.Pictures
+                .Select(p => new Picture
+                {
+                    PictureId = p.PictureId,
+                    CaptionText = p.CaptionText,
+                    PictureFileName = p.PictureFileName,
+                    ProfilePicture = p.ProfilePicture,
+                    PostId = p.PostId,
+                    LikeCount = p.Likes.Count,
+                    Liked = p.Likes.Any(d => d.UserId == userId),
+                    User = new User
+                    {
+                        UserId = p.User.UserId,
+                        FirstName = p.User.FirstName,
+                        LastName = p.User.LastName
+                    }
+                })
+                .FirstOrDefaultAsync(a => a.PictureId == id);
+
+            return new CorePicture(picture, _configuration);
+        }
+
+        public Task<bool> PictureExistsAsync(int id)
+        {
+            return _context.Pictures.AnyAsync(p => p.PictureId == id);
         }
 
         public string PicturesCouldNotBeAddedMessage(List<int> ids)

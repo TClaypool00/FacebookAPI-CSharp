@@ -15,7 +15,11 @@ namespace FacebookAPI.App_Code.BLL
 
         public Task<bool> PictureExistsAsync(int id);
 
+        public Task<bool> UserOwnsPictureAsync(int id, int userId);
+
         public Task UpdateProfilePictureAsync(int id, bool profilePicture);
+
+        public Task DeletePictureAsync(int id);
 
         public string PicturesCouldNotBeAddedMessage(List<int> ids);
         #endregion
@@ -30,6 +34,10 @@ namespace FacebookAPI.App_Code.BLL
         public string PictureDoesNotExistMessage { get; }
 
         public string PictureUpdatedOKMessage { get; }
+
+        public string PictureNotDeletedMessage { get; }
+
+        public string PictureDeletedOKMessage { get; }
         #endregion
     }
 }

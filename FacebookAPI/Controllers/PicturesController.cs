@@ -136,5 +136,30 @@ namespace FacebookAPI.Controllers
                 return InternalError(ex);
             }
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeletePicture(int id)
+        {
+            try
+            {
+                if (IsAdmin && !await _pictureService.PictureExistsAsync(id))
+                {
+                    return NotFound(_pictureService.PictureDoesNotExistMessage);
+                }
+
+                if (!IsAdmin && !await _pictureService.UserOwnsPictureAsync(id, UserId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                await _pictureService.DeletePictureAsync(id);
+
+                return Ok(_pictureService.PictureDeletedOKMessage);
+            }
+            catch (Exception e)
+            {
+                return InternalError(e);
+            }
+        }
     }
 }

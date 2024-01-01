@@ -30,6 +30,10 @@ namespace FacebookAPI.App_Code.DAL
         public string PictureDoesNotExistMessage => $"{_tableName} {_doesNotExistMessage}";
 
         public string PictureUpdatedOKMessage => $"{_tableName} {_updatedOKMessage}";
+
+        public string PictureNotDeletedMessage => $"{_tableName} {_configuration["messages:DeletedError"]}";
+
+        public string PictureDeletedOKMessage => $"{_tableName} {_deletedMessage}";
         #endregion
 
         #region Public Methods
@@ -91,6 +95,83 @@ namespace FacebookAPI.App_Code.DAL
             }
 
             return ids;
+        }
+
+        public async Task DeletePictureAsync(int id)
+        {
+            var picture = await FindPictureById(id);
+            var fileHelper = new FileHelper(_configuration);
+            List<Like> likes;
+
+            try
+            {
+                fileHelper.DeletePicture(picture);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            picture.Comments = await _context.Comments
+                .Where(c => c.PictureId == id)
+                .ToListAsync();
+
+            if (picture.Comments != null)
+            {
+                var dataHelper = new DataEnttiyHelper();
+                var commentIds = dataHelper.GetIds(picture.Comments);
+
+                var replies = await _context.Replies
+                    .Where(r => commentIds.Contains(r.CommentId))
+                    .ToListAsync();
+
+                if (replies is not null)
+                {
+                    var replyIds = dataHelper.GetIds(replies);
+
+                    likes = await _context.Likes
+                        .Where(r => replyIds.Contains((int)r.ReplyId))
+                        .ToListAsync();
+                    
+                    if (likes is not null)
+                    {
+                        _context.Likes.RemoveRange(likes);
+                    }
+
+                    _context.Replies.RemoveRange(replies);
+                    await SaveAsync();
+                }
+
+                likes = null;
+                likes = await _context.Likes
+                    .Where(l => commentIds.Contains((int)l.CommentId))
+                    .ToListAsync();
+
+                if (likes is not null)
+                {
+                    _context.Likes.RemoveRange(likes);
+                    await SaveAsync();
+                }
+
+                likes = null;
+                _context.Comments.RemoveRange(picture.Comments);
+                await SaveAsync();
+            }
+
+            likes = await _context.Likes
+                .Where(l => l.PictureId == id)
+                .ToListAsync();
+
+            if (likes is not null)
+            {
+                _context.Likes.RemoveRange(likes);
+
+                await SaveAsync();
+            }
+
+            _context.Pictures.Remove(picture);
+
+            await SaveAsync();
         }
 
         public async Task<CorePicture> GetPictureByIdAsync(int id, int userId)
@@ -163,6 +244,11 @@ namespace FacebookAPI.App_Code.DAL
 
 
             await SaveAsync();
+        }
+
+        public Task<bool> UserOwnsPictureAsync(int id, int userId)
+        {
+            return _context.Pictures.AnyAsync(p => p.PictureId == id && p.UserId == userId);
         }
         #endregion
 

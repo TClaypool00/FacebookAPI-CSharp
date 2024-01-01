@@ -112,6 +112,36 @@ namespace FacebookAPI.Controllers
             }
         }
 
+        [HttpPut("UpdateProfilePicture/{id}")]
+        public async Task<ActionResult> UpdateProfilePictureAsync(int id, [FromBody] int userId, bool profilePicture)
+        {
+            try
+            {
+                if (!IsAdmin && IsUserIdSame(userId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                if (IsAdmin && !await _pictureService.PictureExistsAsync(id))
+                {
+                    return NotFound(_pictureService.PictureDoesNotExistMessage);
+                }
+
+                if (!IsAdmin && !await _pictureService.UserOwnsPictureAsync(id, UserId))
+                {
+                    return Unauthorized(UnAuthorizedMessage);
+                }
+
+                await _pictureService.UpdateProfilePictureAsync(id, profilePicture, userId);
+
+                return Ok(_pictureService.PictureUpdatedOKMessage);
+            }
+            catch (Exception ex)
+            {
+                return InternalError(ex);
+            }
+        }
+
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdatePictureAsync(int id, [FromBody] SinglePostPictureViewModel model)
         {
@@ -139,7 +169,7 @@ namespace FacebookAPI.Controllers
 
                 if (corePicture.ProfilePicture == false && model.ProfilePicture == true)
                 {
-                    await _pictureService.UpdateProfilePictureAsync(id, model.ProfilePicture);
+                    await _pictureService.UpdateProfilePictureAsync(id, model.ProfilePicture, model.UserId);
                 }
 
                 var updatedCorePicture = new CorePicture(model, id);

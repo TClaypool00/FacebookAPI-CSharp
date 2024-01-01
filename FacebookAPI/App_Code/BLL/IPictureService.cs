@@ -19,7 +19,7 @@ namespace FacebookAPI.App_Code.BLL
 
         public Task<bool> UserOwnsPictureAsync(int id, int userId);
 
-        public Task UpdateProfilePictureAsync(int id, bool profilePicture);
+        public Task UpdateProfilePictureAsync(int id, bool profilePicture, int userId);
 
         public Task DeletePictureAsync(int id);
 

@@ -305,9 +305,23 @@ namespace FacebookAPI.App_Code.DAL
             return new CorePicture(dataPicture, _configuration);
         }
 
-        public async Task UpdateProfilePictureAsync(int id, bool profilePicture)
+        public async Task UpdateProfilePictureAsync(int id, bool profilePicture, int userId)
         {
-            var picture = await FindPictureById(id);
+            Picture picture;
+
+            if (profilePicture)
+            {
+                picture = await _context.Pictures.FirstOrDefaultAsync(p => p.ProfilePicture == true && p.UserId == userId);
+                
+                if (picture is not null)
+                {
+                    picture.ProfilePicture = false;
+
+                    await SaveAsync();
+                }
+            }
+
+            picture = await FindPictureById(id);
             picture.ProfilePicture = profilePicture;
 
 

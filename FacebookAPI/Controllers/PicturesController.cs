@@ -60,6 +60,33 @@ namespace FacebookAPI.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<ActionResult> GetPicturesAsync([FromQuery] int? index = null, int? postId = null)
+        {
+            try
+            {
+                var pictures = await _pictureService.GetPictureAsync(UserId, index, postId);
+
+                if (pictures.Count == 0)
+                {
+                    return NotFound(_pictureService.PicturesNotFoundMessage);
+                }
+
+                var pictureViewModels = new List<PictrueViewModel>();
+
+                for (int i = 0; i < pictures.Count; i++)
+                {
+                    pictureViewModels.Add(new PictrueViewModel(pictures[i]));
+                }
+
+                return Ok(pictureViewModels);
+            }
+            catch (Exception e) 
+            {
+                return InternalError(e);
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult> GetPictureAsync(int id, [FromQuery] bool? includeComments = null, bool? includeReplies = null)
         {

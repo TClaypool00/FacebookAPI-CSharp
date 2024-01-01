@@ -5,6 +5,8 @@ namespace FacebookAPI.App_Code.BLL
     public interface IPictureService
     {
         #region Public Methods
+        public Task<List<CorePicture>> GetPictureAsync(int userId, int? postId = null, int ? index = null);
+
         public Task<CorePicture> AddPictureAsync(CorePicture picture);
 
         public Task<CorePicture> GetPictureByIdAsync(int id, int userId);
@@ -38,6 +40,8 @@ namespace FacebookAPI.App_Code.BLL
         public string PictureNotDeletedMessage { get; }
 
         public string PictureDeletedOKMessage { get; }
+
+        public string PicturesNotFoundMessage { get; }
         #endregion
     }
 }

@@ -34,6 +34,8 @@ namespace FacebookAPI.App_Code.DAL
         public string PictureNotDeletedMessage => $"{_tableName} {_configuration["messages:DeletedError"]}";
 
         public string PictureDeletedOKMessage => $"{_tableName} {_deletedMessage}";
+
+        public string PicturesNotFoundMessage => $"{_multiTableName} {_doesNotExistMessage}";
         #endregion
 
         #region Public Methods
@@ -172,6 +174,72 @@ namespace FacebookAPI.App_Code.DAL
             _context.Pictures.Remove(picture);
 
             await SaveAsync();
+        }
+
+        public async Task<List<CorePicture>> GetPictureAsync(int userId, int? postId = null, int? index = null)
+        {
+            ConfigureIndex(index);
+            var corePictures = new List<CorePicture>();
+            List<Picture> pictures;
+            
+
+            if (postId is not null)
+            {
+                pictures = await _context.Pictures
+                .Take(_takeValue)
+                .Skip(_index)
+                .Select(p => new Picture
+                {
+                    PictureId = p.PictureId,
+                    PictureFileName = p.PictureFileName,
+                    CaptionText = p.CaptionText,
+                    PostId = p.PostId,
+                    LikeCount = p.Likes.Count,
+                    Liked = p.Likes.Any(u => u.UserId == userId),
+                    User = new User
+                    {
+                        UserId = p.User.UserId,
+                        FirstName = p.User.FirstName,
+                        LastName = p.User.LastName,
+
+                    }
+                })
+                .ToListAsync();
+            }
+            else
+            {
+                pictures = await _context.Pictures
+                .Where(b => b.PostId == postId)
+                .Take(_takeValue)
+                .Skip(_index)
+                .Select(p => new Picture
+                {
+                    PictureId = p.PictureId,
+                    PictureFileName = p.PictureFileName,
+                    CaptionText = p.CaptionText,
+                    PostId = p.PostId,
+                    LikeCount = p.Likes.Count,
+                    Liked = p.Likes.Any(u => u.UserId == userId),
+                    User = new User
+                    {
+                        UserId = p.User.UserId,
+                        FirstName = p.User.FirstName,
+                        LastName = p.User.LastName,
+
+                    }
+                })
+                .ToListAsync();
+            }
+
+            if (pictures.Count > 0)
+            {
+                for (int i = 0; i < pictures.Count; i++)
+                {
+                    corePictures.Add(new CorePicture(pictures[i], _configuration));
+                }
+            }
+
+            return corePictures;
         }
 
         public async Task<CorePicture> GetPictureByIdAsync(int id, int userId)

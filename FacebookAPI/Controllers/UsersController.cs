@@ -2,13 +2,13 @@
 using FacebookAPI.App_Code.CoreModels;
 using FacebookAPI.App_Code.ViewModels;
 using FacebookAPI.App_Code.ViewModels.ApiModels;
-using FacebookAPI.App_Code.ViewModels.FullModels;
 using FacebookAPI.App_Code.ViewModels.PostModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace FacebookAPI.Controllers
@@ -125,6 +125,20 @@ namespace FacebookAPI.Controllers
             catch (Exception ex)
             {
                 return InternalError(ex);
+            }
+        }
+
+        [HttpPut("RefreshToken")]
+        public async Task<ActionResult> RefreshTokenAsync()
+        {
+            byte[] randomNumber = new byte[32];
+            string refreshToken;
+
+            using (var randomGenerator = RandomNumberGenerator.Create())
+            {
+                randomGenerator.GetBytes(randomNumber);
+
+                refreshToken = Convert.ToBase64String(randomNumber);
             }
         }
 

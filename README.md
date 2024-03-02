@@ -18,7 +18,7 @@
 
 ### Additional files
 1. You will need to create a file called "SecretConfig.cs" (case-sensitive) in the DatingSite root directory.
-2. Copy the following code and place it in the newly created file.
+2. Copy the following code and place it in the newly created file. Remove the {}. :)
 
 #### SecretConfig.cs
 ```c#
@@ -27,13 +27,13 @@ namespace FacebookAPI
 {
     public class SecretConfig
     {
-        public static string ConnectionString { get; } = "server=localhost;user=root;password=;database=facebook_c_sharp";
+        public static string ConnectionString { get; } = "server={your server};user={your username};password={your password};database=facebook_c_sharp";
 
         public static Version Version { get; } = new Version(8, 0, 31);
 
-        public static string SecretKey { get; } = "Facebook API #@$!#@#@!@###@!#$#@^$#";
+        public static string SecretKey { get; } = "{Your secret key}";
 
-        public static string DirectoryPath { get; } = @"C:\xampp\htdocs\FacebookAPI";
+        public static string DirectoryPath { get; } = @"{Your path}";
     }
 }
 
